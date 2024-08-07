@@ -42,7 +42,7 @@ jobs:
         
     - name: Build application
       run: |
-        chmod -x ./gradlew
+        chmod +x ./gradlew
         ./gradlew build
     
     - name: Docker hub login

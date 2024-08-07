@@ -1,7 +1,7 @@
 name: deerear_cd
 on:
-  project:
-    types: [deleted]
+  pull_request:
+    branches: ["main"]
 
 jobs:
   build:

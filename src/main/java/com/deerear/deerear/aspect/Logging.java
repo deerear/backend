@@ -21,9 +21,13 @@ public class Logging {
     private static final String STARTED_AT = "startedAt";
     private static final String CALL_COUNT = "callCount";
 
+    private static final String CONTROLLER = "execution(* com.deerear.deerear.controller..*.*(..))";
+    private static final String SERVICE = "execution(* com.deerear.deerear.service..*.*(..))";
+    private static final String CONTROLLER_OR_SERVICE = "execution(* com.deerear.deerear.controller..*.*(..)) || execution(* com.deerear.deerear.service..*.*(..))";
+
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 
-    @Pointcut("execution(* com.deerear.deerear.controller..*.*(..))")
+    @Pointcut(CONTROLLER)
     private void pointcut(){}
 
     @Before("pointcut()")
@@ -44,7 +48,7 @@ public class Logging {
         log.info("|{}| Controller: {}.{} called", requestId, className, methodName);
     }
 
-    @Before("execution(* com.deerear.deerear.service..*.*(..))")
+    @Before(SERVICE)
     public void beforeService(JoinPoint joinPoint) {
         String requestId = MDC.get(REQUEST_ID);
         String callCnt = MDC.get(CALL_COUNT);
@@ -69,7 +73,7 @@ public class Logging {
 
     }
 
-    @AfterReturning(pointcut = "execution(* com.deerear.deerear.service..*.*(..))", returning = "result")
+    @AfterReturning(pointcut = SERVICE, returning = "result")
     public void afterReturningService(JoinPoint joinPoint, Object result) {
         String requestId = MDC.get(REQUEST_ID);
 
@@ -86,7 +90,7 @@ public class Logging {
         MDC.put(CALL_COUNT, String.valueOf(callCount));
     }
 
-    @AfterThrowing(pointcut  = "execution(* com.deerear.deerear.controller..*.*(..)) || execution(* com.deerear.deerear.service..*.*(..))", throwing = "exception")
+    @AfterThrowing(pointcut  =CONTROLLER_OR_SERVICE, throwing = "exception")
     public void afterThrowing(JoinPoint joinPoint, Throwable exception) {
         String requestId = MDC.get(REQUEST_ID);
         String timestamp = dateFormat.format(new Date());
@@ -101,7 +105,7 @@ public class Logging {
         log.error("|{}| Stack Trace: {}", requestId, stackTrace);
     }
 
-    @AfterReturning(pointcut = "execution(* com.deerear.deerear.controller..*.*(..))", returning = "result")
+    @AfterReturning(pointcut = CONTROLLER, returning = "result")
     public void afterReturning(JoinPoint joinPoint, Object result) {
         String timestamp = dateFormat.format(new Date());
 

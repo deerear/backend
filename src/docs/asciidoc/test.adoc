@@ -1,9 +1,0 @@
-== RestDocsTest
-=== Get
-operation::rest-docs-test-controller/get-rest-docs-test/[snippets="curl-request,response-body,http-response"]
-=== Post
-operation::rest-docs-test-controller/post-rest-docs-test/[snippets="curl-request,request-body,response-body,http-response"]
-=== Put
-operation::rest-docs-test-controller/put-rest-docs-test/[snippets="curl-request,request-body,response-body,http-response"]
-=== Delete
-operation::rest-docs-test-controller/delete-rest-docs-test/[snippets="curl-request,response-body,http-response"]

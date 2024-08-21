@@ -7,7 +7,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class RestDocsDto {
+public class RestDocsDTO {
 
     @NotNull
     private Long id;

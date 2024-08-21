@@ -6,11 +6,21 @@ REST Docs
 :toclevels: 2
 :seclinks:
 
-[[API-LIST]]
-== APIs
+[[overview]]
+== 1. Overview
 
-[[overview-http-status-codes]]
-=== HTTP status codes
+[[host]]
+=== Host
+|===
+| host/ip | 비고
+
+| `localhost` | `Individual PC`
+
+
+|===
+
+[[http-status-codes]]
+=== HTTP Status Codes
 
 |===
 | 상태 코드 | 설명
@@ -34,4 +44,4 @@ REST Docs
 | 서버 에러
 |===
 
-include::test.adoc[]
+include::rest-docs-controller.adoc[]

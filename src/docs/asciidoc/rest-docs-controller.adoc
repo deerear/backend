@@ -1,0 +1,16 @@
+== 1) RestDocsController
+
+=== [Get]
+operation::rest-docs-controller-test/get-rest-docs-test/[snippets="curl-request,response-body,response-fields,http-response"]
+
+=== [List]
+operation::rest-docs-controller-test/list-rest-docs-test/[snippets="curl-request,response-body,http-response"]
+
+=== [Post]
+operation::rest-docs-controller-test/post-rest-docs-test/[snippets="curl-request,request-body,response-body,http-response"]
+
+=== [Put]
+operation::rest-docs-controller-test/put-rest-docs-test/[snippets="curl-request,request-body,response-body,http-response"]
+
+=== [Delete]
+operation::rest-docs-controller-test/delete-rest-docs-test/[snippets="curl-request,response-body,http-response"]

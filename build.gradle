@@ -58,6 +58,9 @@ ext {
 tasks.named('test') {
 	useJUnitPlatform()
 	outputs.dir snippetsDir
+
+	// 추가된 부분
+	jvmArgs "-Xshare:off"
 }
 
 asciidoctor {
@@ -71,12 +74,15 @@ asciidoctor.doFirst {
 	delete file('src/main/resources/static/docs')
 }
 
-task copyDocument(type: Copy) {
+tasks.register('copyDocument', Copy) {
 	dependsOn asciidoctor
 	from file("build/docs/asciidoc")
 	into file("src/main/resources/static/docs")
 }
 
+tasks.withType(JavaCompile).configureEach {
+	options.compilerArgs << '-parameters'
+}
 
 build {
 	dependsOn copyDocument

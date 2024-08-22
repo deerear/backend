@@ -1,16 +1,38 @@
-== 1) RestDocsController
+= 1) RestDocs API
+:doctype: book
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+:seclinks:
 
-=== [Get]
-operation::rest-docs-controller-test/get-rest-docs-test/[snippets="curl-request,response-body,response-fields,http-response"]
+== link:index.html[Back to Index, window=blank]
 
-=== [List]
-operation::rest-docs-controller-test/list-rest-docs-test/[snippets="curl-request,response-body,http-response"]
+== APIs
 
-=== [Post]
-operation::rest-docs-controller-test/post-rest-docs-test/[snippets="curl-request,request-body,response-body,http-response"]
+[[Get]]
+=== Get RestDocs (Single Object)
+operation::rest-docs-controller-test/get-rest-docs-test/[snippets="curl-request,path-parameters,response-body,response-fields,http-response"]
 
-=== [Put]
-operation::rest-docs-controller-test/put-rest-docs-test/[snippets="curl-request,request-body,response-body,http-response"]
+'''
 
-=== [Delete]
-operation::rest-docs-controller-test/delete-rest-docs-test/[snippets="curl-request,response-body,http-response"]
+[[List]]
+=== List RestDocs (Multi Object)
+operation::rest-docs-controller-test/list-rest-docs-test/[snippets="curl-request,query-parameters,response-body,response-fields,http-response"]
+
+'''
+
+[[Create]]
+=== Create RestDocs
+operation::rest-docs-controller-test/post-rest-docs-test/[snippets="curl-request,request-body,request-fields,response-body,response-fields,http-response"]
+
+'''
+
+[[Update]]
+=== Update RestDocs
+operation::rest-docs-controller-test/put-rest-docs-test/[snippets="curl-request,path-parameters,request-body,response-body,response-fields,http-response"]
+
+'''
+
+[[Delete]]
+=== Delete RestDocs
+operation::rest-docs-controller-test/delete-rest-docs-test/[snippets="curl-request,path-parameters,http-response"]

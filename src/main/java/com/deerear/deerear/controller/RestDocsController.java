@@ -1,83 +1,60 @@
 package com.deerear.deerear.controller;
 
-import com.deerear.deerear.dto.RestDocsDTO;
+import com.deerear.deerear.dto.RestDocsRequestDTO;
+import com.deerear.deerear.dto.RestDocsResponseDTO;
+import com.deerear.deerear.service.RestDocsService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RequestMapping("/restdoc")
+@RequiredArgsConstructor
 @RestController
 public class RestDocsController {
 
+    private final RestDocsService restDocsService;
+
     @GetMapping("/{id}")
-    public ResponseEntity<RestDocsDTO> getRestDocs(@PathVariable Long id){
-        RestDocsDTO restDocs = RestDocsDTO.builder()
-                .id(id)
-                .name("Test User")
-                .description("This is Test User")
-                .estimateValue((double) 0)
-                .build();
-        return new ResponseEntity<>(restDocs, HttpStatus.OK);
+    public ResponseEntity<RestDocsResponseDTO> getRestDocs(@PathVariable("id") Long id){
+
+        RestDocsResponseDTO response = restDocsService.getRestDocs(id);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping("")
-    public ResponseEntity<List<RestDocsDTO>> listRestDocs(@RequestParam Integer limit, @RequestParam Integer offset ){
-        List<RestDocsDTO> restDocsList = new ArrayList<RestDocsDTO>();
+    public ResponseEntity<List<RestDocsResponseDTO>> listRestDocs(@RequestParam("limit") Integer limit, @RequestParam("offset") Integer offset ){
 
-        RestDocsDTO testDoc1 = RestDocsDTO.builder()
-                .id((long) 1)
-                .name("Test User 1")
-                .description("List Test")
-                .estimateValue((double) 0)
-                .build();
+        List<RestDocsResponseDTO> response = restDocsService.listRestDocs(limit, offset);
 
-        RestDocsDTO testDoc2 = RestDocsDTO.builder()
-                .id((long) 2)
-                .name("Test User 2")
-                .description("List Test")
-                .estimateValue((double) 0)
-                .build();
-
-        restDocsList.add(testDoc1);
-        restDocsList.add(testDoc2);
-
-        return new ResponseEntity<>(restDocsList, HttpStatus.OK);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PostMapping("")
-    public ResponseEntity<RestDocsDTO> postRestDocs(@RequestBody RestDocsDTO input){
-        RestDocsDTO restDocs = RestDocsDTO.builder()
-                .id((long)777)
-                .name(input.getName())
-                .description(input.getDescription())
-                .estimateValue((double) 0)
-                .build();
-        return new ResponseEntity<>(restDocs, HttpStatus.OK);
+    public ResponseEntity<RestDocsResponseDTO> postRestDocs(@RequestBody RestDocsRequestDTO request){
+
+        RestDocsResponseDTO response = restDocsService.postRestDocs(request);
+
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<RestDocsDTO> putRestDocs(@PathVariable Long id, @RequestBody RestDocsDTO input){
-        RestDocsDTO restDocs = RestDocsDTO.builder()
-                .id(id)
-                .name("Test User")
-                .description("Put Test")
-                .estimateValue((double) 0)
-                .build();
-        return new ResponseEntity<>(restDocs, HttpStatus.OK);
+    public ResponseEntity<RestDocsResponseDTO> putRestDocs(@PathVariable("id") Long id, @RequestBody RestDocsRequestDTO request){
+
+        RestDocsResponseDTO response = restDocsService.putRestDocs(id, request);
+
+        return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<RestDocsDTO> deleteRestDocs(@PathVariable Long id){
-        RestDocsDTO restDocs = RestDocsDTO.builder()
-                .id(id)
-                .name("Test User")
-                .description("Delete Test")
-                .estimateValue((double) 0)
-                .build();
-        return new ResponseEntity<>(restDocs, HttpStatus.OK);
+    public ResponseEntity<RestDocsResponseDTO> deleteRestDocs(@PathVariable("id") Long id){
+
+        restDocsService.deleteRestDocs(id);
+
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
 

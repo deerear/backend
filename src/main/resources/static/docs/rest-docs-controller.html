@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 2.0.18">
-<title>1) RestDocsController</title>
+<title>1) RestDocs API</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
 /*! Asciidoctor default stylesheet | MIT License | https://asciidoctor.org */
@@ -435,36 +435,84 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 #footer-text{color:rgba(0,0,0,.6);font-size:.9em}}
 @media amzn-kf8{#header,#content,#footnotes,#footer{padding:0}}
 </style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/styles/github.min.css">
 </head>
-<body class="article">
+<body class="book toc2 toc-left">
 <div id="header">
+<h1>1) RestDocs API</h1>
+<div class="details">
+<span id="revnumber">version 0.0.1-SNAPSHOT</span>
+</div>
+<div id="toc" class="toc2">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_back_to_index">Back to Index</a></li>
+<li><a href="#_apis">APIs</a>
+<ul class="sectlevel2">
+<li><a href="#Get">Get RestDocs (Single Object)</a></li>
+<li><a href="#List">List RestDocs (Multi Object)</a></li>
+<li><a href="#Create">Create RestDocs</a></li>
+<li><a href="#Update">Update RestDocs</a></li>
+<li><a href="#Delete">Delete RestDocs</a></li>
+</ul>
+</li>
+</ul>
+</div>
 </div>
 <div id="content">
 <div class="sect1">
-<h2 id="_1_restdocscontroller">1) RestDocsController</h2>
+<h2 id="_back_to_index"><a href="index.html" target="blank">Back to Index</a></h2>
+<div class="sectionbody">
+
+</div>
+</div>
+<div class="sect1">
+<h2 id="_apis">APIs</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_get">[Get]</h3>
+<h3 id="Get">Get RestDocs (Single Object)</h3>
 <div class="sect3">
-<h4 id="_get_curl_request">Curl request</h4>
+<h4 id="Get_curl_request">Curl request</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">$ curl 'http://localhost:8080/restdoc/1' -i -X GET \
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ curl 'http://localhost:8080/restdoc/1' -i -X GET \
     -H 'Content-Type: application/json;charset=UTF-8' \
     -H 'Accept: application/json'</code></pre>
 </div>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_get_response_body">Response body</h4>
+<h4 id="Get_path_parameters">Path parameters</h4>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 1. /restdoc/{id}</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Parameter</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">id 값</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="Get_response_body">Response body</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight nowrap"><code class="language-json" data-lang="json">{"id":1,"name":"Test User","description":"This is Test User","estimateValue":0.0}</code></pre>
+<pre class="highlightjs highlight nowrap"><code class="language-json hljs" data-lang="json">{"id":1,"name":"이름","description":"단건 조회","estimateValue":1000.0}</code></pre>
 </div>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_get_response_fields">Response fields</h4>
+<h4 id="Get_response_fields">Response fields</h4>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 33.3333%;">
@@ -482,251 +530,395 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>id</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">id</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">id 값</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>name</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">name</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">이름 값</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>description</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">description</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">설명 값</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>estimateValue</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">estimateValue</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">추정 값</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="sect3">
-<h4 id="_get_http_response">HTTP response</h4>
+<h4 id="Get_http_response">HTTP response</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json;charset=UTF-8
-Content-Length: 81
+Content-Length: 77
 
-{"id":1,"name":"Test User","description":"This is Test User","estimateValue":0.0}</code></pre>
+{"id":1,"name":"이름","description":"단건 조회","estimateValue":1000.0}</code></pre>
 </div>
 </div>
 </div>
+<hr>
 </div>
 <div class="sect2">
-<h3 id="_list">[List]</h3>
+<h3 id="List">List RestDocs (Multi Object)</h3>
 <div class="sect3">
-<h4 id="_list_curl_request">Curl request</h4>
+<h4 id="List_curl_request">Curl request</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">$ curl 'http://localhost:8080/restdoc?limit=10&amp;offset=1' -i -X GET \
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ curl 'http://localhost:8080/restdoc?limit=10&amp;offset=1' -i -X GET \
     -H 'Content-Type: application/json;charset=UTF-8' \
     -H 'Accept: application/json'</code></pre>
 </div>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_list_response_body">Response body</h4>
+<h4 id="List_query_parameters">Query parameters</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Parameter</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>limit</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">제한 값</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>offset</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">오프셋 값</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="List_response_body">Response body</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight nowrap"><code class="language-json" data-lang="json">[ {
-  "id" : 1,
-  "name" : "Test User 1",
-  "description" : "List Test",
-  "estimateValue" : 0.0
-}, {
-  "id" : 2,
-  "name" : "Test User 2",
-  "description" : "List Test",
-  "estimateValue" : 0.0
-} ]</code></pre>
+<pre class="highlightjs highlight nowrap"><code class="language-json hljs" data-lang="json">[{"id":1,"name":"이름 1","description":"다건 조회 1","estimateValue":1000.0},{"id":2,"name":"이름 2","description":"다건 조회 2","estimateValue":1000.0}]</code></pre>
 </div>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_list_http_response">HTTP response</h4>
+<h4 id="List_response_fields">Response fields</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Path</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>[].id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">id 값</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>[].name</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">이름 값</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>[].description</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">설명 값</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>[].estimateValue</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">추정 값</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="List_http_response">HTTP response</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json;charset=UTF-8
-Content-Length: 208
+Content-Length: 165
 
-[ {
-  "id" : 1,
-  "name" : "Test User 1",
-  "description" : "List Test",
-  "estimateValue" : 0.0
-}, {
-  "id" : 2,
-  "name" : "Test User 2",
-  "description" : "List Test",
-  "estimateValue" : 0.0
-} ]</code></pre>
+[{"id":1,"name":"이름 1","description":"다건 조회 1","estimateValue":1000.0},{"id":2,"name":"이름 2","description":"다건 조회 2","estimateValue":1000.0}]</code></pre>
 </div>
 </div>
 </div>
+<hr>
 </div>
 <div class="sect2">
-<h3 id="_post">[Post]</h3>
+<h3 id="Create">Create RestDocs</h3>
 <div class="sect3">
-<h4 id="_post_curl_request">Curl request</h4>
+<h4 id="Create_curl_request">Curl request</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">$ curl 'http://localhost:8080/restdoc' -i -X POST \
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ curl 'http://localhost:8080/restdoc' -i -X POST \
     -H 'Content-Type: application/json;charset=UTF-8' \
-    -d '{
-  "id" : 777,
-  "name" : null,
-  "description" : "test",
-  "estimateValue" : null
-}'</code></pre>
+    -H 'Accept: application/json' \
+    -d '{"name":"이름","description":"Create Test","estimateValue":1000.0}'</code></pre>
 </div>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_post_request_body">Request body</h4>
+<h4 id="Create_request_body">Request body</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight nowrap"><code class="language-json" data-lang="json">{
-  "id" : 777,
-  "name" : null,
-  "description" : "test",
-  "estimateValue" : null
-}</code></pre>
+<pre class="highlightjs highlight nowrap"><code class="language-json hljs" data-lang="json">{"name":"이름","description":"Create Test","estimateValue":1000.0}</code></pre>
 </div>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_post_response_body">Response body</h4>
+<h4 id="Create_request_fields">Request fields</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Path</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>name</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">이름 값</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>description</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">설명 값</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>estimateValue</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">추정 값</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="Create_response_body">Response body</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight nowrap"><code class="language-json" data-lang="json">{
-  "id" : 777,
-  "name" : null,
-  "description" : "test",
-  "estimateValue" : 0.0
-}</code></pre>
+<pre class="highlightjs highlight nowrap"><code class="language-json hljs" data-lang="json">{"id":777,"name":"이름","description":"Create Test","estimateValue":1000.0}</code></pre>
 </div>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_post_http_response">HTTP response</h4>
+<h4 id="Create_response_fields">Response fields</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Path</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">id 값</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>name</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">이름 값</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>description</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">설명 값</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>estimateValue</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">추정 값</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="Create_http_response">HTTP response</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 201 Created
 Content-Type: application/json;charset=UTF-8
-Content-Length: 89
+Content-Length: 77
 
-{
-  "id" : 777,
-  "name" : null,
-  "description" : "test",
-  "estimateValue" : 0.0
-}</code></pre>
+{"id":777,"name":"이름","description":"Create Test","estimateValue":1000.0}</code></pre>
 </div>
 </div>
 </div>
+<hr>
 </div>
 <div class="sect2">
-<h3 id="_put">[Put]</h3>
+<h3 id="Update">Update RestDocs</h3>
 <div class="sect3">
-<h4 id="_put_curl_request">Curl request</h4>
+<h4 id="Update_curl_request">Curl request</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">$ curl 'http://localhost:8080/restdoc/1' -i -X PUT \
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ curl 'http://localhost:8080/restdoc/1' -i -X PUT \
     -H 'Content-Type: application/json;charset=UTF-8' \
-    -d '{
-  "id" : 777,
-  "name" : null,
-  "description" : "test",
-  "estimateValue" : null
-}'</code></pre>
+    -H 'Accept: application/json' \
+    -d '{"name":"이름","description":"Put Test","estimateValue":1000.0}'</code></pre>
 </div>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_put_request_body">Request body</h4>
+<h4 id="Update_path_parameters">Path parameters</h4>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 1. /restdoc/{id}</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Parameter</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">id 값</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="Update_request_body">Request body</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight nowrap"><code class="language-json" data-lang="json">{
-  "id" : 777,
-  "name" : null,
-  "description" : "test",
-  "estimateValue" : null
-}</code></pre>
+<pre class="highlightjs highlight nowrap"><code class="language-json hljs" data-lang="json">{"name":"이름","description":"Put Test","estimateValue":1000.0}</code></pre>
 </div>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_put_response_body">Response body</h4>
+<h4 id="Update_response_body">Response body</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight nowrap"><code class="language-json" data-lang="json">{
-  "id" : 1,
-  "name" : "Test User",
-  "description" : "Put Test",
-  "estimateValue" : 0.0
-}</code></pre>
+<pre class="highlightjs highlight nowrap"><code class="language-json hljs" data-lang="json">{"id":1,"name":"이름","description":"Put Test","estimateValue":1000.0}</code></pre>
 </div>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_put_http_response">HTTP response</h4>
+<h4 id="Update_response_fields">Response fields</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Path</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">id 값</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>name</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">이름 값</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>description</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">설명 값</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>estimateValue</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">추정 값</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="Update_http_response">HTTP response</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 202 Accepted
 Content-Type: application/json;charset=UTF-8
-Content-Length: 98
+Content-Length: 72
 
-{
-  "id" : 1,
-  "name" : "Test User",
-  "description" : "Put Test",
-  "estimateValue" : 0.0
-}</code></pre>
+{"id":1,"name":"이름","description":"Put Test","estimateValue":1000.0}</code></pre>
 </div>
 </div>
 </div>
+<hr>
 </div>
 <div class="sect2">
-<h3 id="_delete">[Delete]</h3>
+<h3 id="Delete">Delete RestDocs</h3>
 <div class="sect3">
-<h4 id="_delete_curl_request">Curl request</h4>
+<h4 id="Delete_curl_request">Curl request</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">$ curl 'http://localhost:8080/restdoc/1' -i -X DELETE</code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_delete_response_body">Response body</h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight nowrap"><code class="language-json" data-lang="json">{
-  "id" : 1,
-  "name" : "Test User",
-  "description" : "Delete Test",
-  "estimateValue" : 0.0
-}</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ curl 'http://localhost:8080/restdoc/1' -i -X DELETE</code></pre>
 </div>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_delete_http_response">HTTP response</h4>
+<h4 id="Delete_path_parameters">Path parameters</h4>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 1. /restdoc/{id}</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Parameter</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">id 값</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="Delete_http_response">HTTP response</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
-Content-Type: application/json;charset=UTF-8
-Content-Length: 101
-
-{
-  "id" : 1,
-  "name" : "Test User",
-  "description" : "Delete Test",
-  "estimateValue" : 0.0
-}</code></pre>
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 204 No Content</code></pre>
 </div>
 </div>
 </div>
@@ -737,8 +929,15 @@ Content-Length: 101
 <div id="footer">
 <div id="footer-text">
 Version 0.0.1-SNAPSHOT<br>
-Last updated 2024-08-21 17:54:54 +0900
+Last updated 2024-08-22 17:25:24 +0900
 </div>
 </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/highlight.min.js"></script>
+<script>
+if (!hljs.initHighlighting.called) {
+  hljs.initHighlighting.called = true
+  ;[].slice.call(document.querySelectorAll('pre.highlight > code[data-lang]')).forEach(function (el) { hljs.highlightBlock(el) })
+}
+</script>
 </body>
 </html>

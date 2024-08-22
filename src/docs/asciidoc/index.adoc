@@ -26,16 +26,25 @@ REST Docs
 | 상태 코드 | 설명
 
 | `200 OK`
-| 성공
+| 성공 (조회)
+
+| `201 Created`
+| 성공 (생성)
+
+| `202 Accepted`
+| 성공 (수정)
+
+| `204 No Content`
+| 성공 (삭제)
 
 | `400 Bad Request`
 | 잘못된 요청
 
 | `401 Unauthorized`
-| 비인증 상태
+| 권한이 없음
 
 | `403 Forbidden`
-| 권한 거부
+| 금지된 요청
 
 | `404 Not Found`
 | 존재하지 않는 리소스
@@ -44,4 +53,8 @@ REST Docs
 | 서버 에러
 |===
 
-include::rest-docs-controller.adoc[]
+== 2. APIs
+=== - link:rest-docs-controller.html[RestDocs API, window=blank]
+
+== 3. Error
+=== - link:https://www.google.com[link]

@@ -15,9 +15,8 @@ REST Docs
 | host/ip | 비고
 
 | `localhost` | `Individual PC`
-
-
 |===
+
 
 [[http-status-codes]]
 === HTTP Status Codes
@@ -38,23 +37,26 @@ REST Docs
 | 성공 (삭제)
 
 | `400 Bad Request`
-| 잘못된 요청
+| 에러 (잘못된 요청)
 
 | `401 Unauthorized`
-| 권한이 없음
+| 에러 (권한이 없음)
 
 | `403 Forbidden`
-| 금지된 요청
+| 에러 (금지된 요청)
 
 | `404 Not Found`
-| 존재하지 않는 리소스
+| 에러 (존재하지 않는 리소스)
 
 | `500 Internal Server Error`
-| 서버 에러
+| 에러 (서버 에러)
 |===
 
-== 2. APIs
-=== - link:rest-docs-controller.html[RestDocs API, window=blank]
 
-== 3. Error
-=== - link:https://www.google.com[link]
+== 2. APIs link:rest-docs-controller.html[(Example)]
+=== 1) User API
+=== 2) Board API
+=== 3) Comment API
+
+
+== 3. Errors link:https://www.google.com[(Todo)]

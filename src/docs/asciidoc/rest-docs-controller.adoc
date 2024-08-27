@@ -10,29 +10,50 @@
 == APIs
 
 [[Get]]
-=== Get RestDocs (Single Object)
+=== 1. Get RestDocs
+==== : 단건 조회 API
+
+
+=====
 operation::rest-docs-controller-test/get-rest-docs-test/[snippets="curl-request,path-parameters,response-body,response-fields,http-response"]
+=====
 
 '''
 
 [[List]]
-=== List RestDocs (Multi Object)
+=== 2. List RestDocs
+==== : 다건 조회 API
+
+=====
 operation::rest-docs-controller-test/list-rest-docs-test/[snippets="curl-request,query-parameters,response-body,response-fields,http-response"]
+=====
 
 '''
 
 [[Create]]
-=== Create RestDocs
+=== 3. Create RestDocs
+==== 생성 API
+
+=====
 operation::rest-docs-controller-test/post-rest-docs-test/[snippets="curl-request,request-body,request-fields,response-body,response-fields,http-response"]
+=====
 
 '''
 
 [[Update]]
-=== Update RestDocs
+=== 4. Update RestDocs
+==== 수정 API
+
+=====
 operation::rest-docs-controller-test/put-rest-docs-test/[snippets="curl-request,path-parameters,request-body,response-body,response-fields,http-response"]
+=====
 
 '''
 
 [[Delete]]
-=== Delete RestDocs
+=== 5. Delete RestDocs
+==== 삭제 API
+
+=====
 operation::rest-docs-controller-test/delete-rest-docs-test/[snippets="curl-request,path-parameters,http-response"]
+=====

@@ -454,16 +454,14 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#http-status-codes">HTTP Status Codes</a></li>
 </ul>
 </li>
-<li><a href="#_2_apis">2. APIs</a>
+<li><a href="#_2_apis_example">2. APIs (Example)</a>
 <ul class="sectlevel2">
-<li><a href="#_restdocs_api">- RestDocs API</a></li>
+<li><a href="#_1_user_api">1) User API</a></li>
+<li><a href="#_2_board_api">2) Board API</a></li>
+<li><a href="#_3_comment_api">3) Comment API</a></li>
 </ul>
 </li>
-<li><a href="#_3_error">3. Error</a>
-<ul class="sectlevel2">
-<li><a href="#_link">- link</a></li>
-</ul>
-</li>
+<li><a href="#_3_errors_todo">3. Errors (Todo)</a></li>
 </ul>
 </div>
 </div>
@@ -524,23 +522,23 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>400 Bad Request</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">잘못된 요청</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">에러 (잘못된 요청)</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>401 Unauthorized</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">권한이 없음</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">에러 (권한이 없음)</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>403 Forbidden</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">금지된 요청</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">에러 (금지된 요청)</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>404 Not Found</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">존재하지 않는 리소스</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">에러 (존재하지 않는 리소스)</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>500 Internal Server Error</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">서버 에러</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">에러 (서버 에러)</p></td>
 </tr>
 </tbody>
 </table>
@@ -548,28 +546,33 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 </div>
 <div class="sect1">
-<h2 id="_2_apis">2. APIs</h2>
+<h2 id="_2_apis_example">2. APIs <a href="rest-docs-controller.html">(Example)</a></h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_restdocs_api">- <a href="rest-docs-controller.html" target="blank">RestDocs API</a></h3>
+<h3 id="_1_user_api">1) User API</h3>
+
+</div>
+<div class="sect2">
+<h3 id="_2_board_api">2) Board API</h3>
+
+</div>
+<div class="sect2">
+<h3 id="_3_comment_api">3) Comment API</h3>
 
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_3_error">3. Error</h2>
+<h2 id="_3_errors_todo">3. Errors <a href="https://www.google.com">(Todo)</a></h2>
 <div class="sectionbody">
-<div class="sect2">
-<h3 id="_link">- <a href="https://www.google.com">link</a></h3>
 
-</div>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
 Version 0.0.1-SNAPSHOT<br>
-Last updated 2024-08-22 17:31:11 +0900
+Last updated 2024-08-27 17:48:30 +0900
 </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/highlight.min.js"></script>

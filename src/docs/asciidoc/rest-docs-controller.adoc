@@ -9,51 +9,63 @@
 
 == APIs
 
+// 추가할 snippets 양식
+// operation::{Test Controller 명 - Kebab Case}/{Test Method 명 - Kebab Case}/[snippets="사용할 snippets"]
+
 [[Get]]
-=== 1. Get RestDocs
+=== 1. Get Object
 ==== : 단건 조회 API
 
+=====
+operation::rest-docs-controller-test/get-rest-docs-test/[snippets="path-parameters,response-fields,http-response"]
+=====
+
+'''
+
+[[Get-With-Headers]]
+=== 1-1. Get Object with Headers
+==== : 단건 조회 API (With Headers)
 
 =====
-operation::rest-docs-controller-test/get-rest-docs-test/[snippets="curl-request,path-parameters,response-body,response-fields,http-response"]
+operation::rest-docs-controller-test/get-rest-docs-with-headers-test/[snippets="path-parameters,request-headers,response-fields,http-response"]
 =====
 
 '''
 
 [[List]]
-=== 2. List RestDocs
+=== 2. List Objects
 ==== : 다건 조회 API
 
 =====
-operation::rest-docs-controller-test/list-rest-docs-test/[snippets="curl-request,query-parameters,response-body,response-fields,http-response"]
+operation::rest-docs-controller-test/list-rest-docs-test/[snippets="query-parameters,response-fields,http-response"]
 =====
 
 '''
 
 [[Create]]
-=== 3. Create RestDocs
-==== 생성 API
+=== 3. Create Object
+==== : 생성 API
 
 =====
-operation::rest-docs-controller-test/post-rest-docs-test/[snippets="curl-request,request-body,request-fields,response-body,response-fields,http-response"]
+operation::rest-docs-controller-test/post-rest-docs-test/[snippets="request-body,request-fields,response-fields,http-response"]
 =====
 
 '''
 
 [[Update]]
-=== 4. Update RestDocs
-==== 수정 API
+=== 4. Update Object
+==== : 수정 API
 
 =====
-operation::rest-docs-controller-test/put-rest-docs-test/[snippets="curl-request,path-parameters,request-body,response-body,response-fields,http-response"]
+operation::rest-docs-controller-test/put-rest-docs-test/[snippets="path-parameters,request-fields,request-body,response-fields,http-response"]
 =====
 
 '''
 
 [[Delete]]
-=== 5. Delete RestDocs
-==== 삭제 API
+=== 5. Delete Object
+==== : 삭제 API
 
 =====
-operation::rest-docs-controller-test/delete-rest-docs-test/[snippets="curl-request,path-parameters,http-response"]
+operation::rest-docs-controller-test/delete-rest-docs-test/[snippets="path-parameters,http-response"]
 =====

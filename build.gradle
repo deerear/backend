@@ -59,7 +59,6 @@ tasks.named('test') {
 	useJUnitPlatform()
 	outputs.dir snippetsDir
 
-	// 추가된 부분
 	jvmArgs "-Xshare:off"
 }
 
@@ -68,6 +67,9 @@ asciidoctor {
 	baseDirFollowsSourceFile()
 	inputs.dir snippetsDir
 	dependsOn test
+	forkOptions {
+		jvmArgs("--add-opens", "java.base/sun.nio.ch=ALL-UNNAMED", "--add-opens", "java.base/java.io=ALL-UNNAMED")
+	}
 }
 
 asciidoctor.doFirst {

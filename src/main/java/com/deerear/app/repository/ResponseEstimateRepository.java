@@ -1,4 +1,4 @@
-package com.deerear.deerear.repository;
+package com.deerear.app.repository;
 
 public class ResponseEstimateRepository {
 }

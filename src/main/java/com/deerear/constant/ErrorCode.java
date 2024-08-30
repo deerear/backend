@@ -1,4 +1,4 @@
-package com.deerear.deerear.constant;
+package com.deerear.constant;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

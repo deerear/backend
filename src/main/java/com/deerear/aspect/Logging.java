@@ -1,4 +1,4 @@
-package com.deerear.deerear.aspect;
+package com.deerear.aspect;
 
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
@@ -74,10 +74,10 @@ public class Logging {
     }
 
     @AfterReturning(pointcut = SERVICE, returning = "result")
-    public void afterReturningService(JoinPoint joinPoint, Object result) {
+    public void afterReturningService(Object result) {
         String requestId = MDC.get(REQUEST_ID);
-
         String callCnt = MDC.get(CALL_COUNT);
+
         int callCount = callCnt == null ? 0 : Integer.parseInt(callCnt)-1;
         String padding = "    ".repeat(callCount);
 
@@ -106,7 +106,7 @@ public class Logging {
     }
 
     @AfterReturning(pointcut = CONTROLLER, returning = "result")
-    public void afterReturning(JoinPoint joinPoint, Object result) {
+    public void afterReturning(Object result) {
         String timestamp = dateFormat.format(new Date());
 
         String requestId = MDC.get(REQUEST_ID);

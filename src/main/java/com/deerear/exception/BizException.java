@@ -1,6 +1,6 @@
-package com.deerear.deerear.exception;
+package com.deerear.exception;
 
-import com.deerear.deerear.constant.ErrorCode;
+import com.deerear.constant.ErrorCode;
 import lombok.Getter;
 
 @Getter

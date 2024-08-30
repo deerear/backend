@@ -5,12 +5,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
-public class DearExceptionHandler {
+public class BizExceptionHandler {
 
-    @ExceptionHandler(DearException.class)
-    public ResponseEntity<ErrorResponse> handleDearException(DearException e) {
+    @ExceptionHandler(BizException.class)
+    public ResponseEntity<ErrorResponse> handleDearException(BizException e) {
         ErrorResponse errorResponse = new ErrorResponse(
-                e.getErrorCodeEnum().getStatus().value(),
                 e.getMessage(),
                 e.getErrorCodeEnum().getCode(),
                 e.getErrorCodeEnum().getMessage(),

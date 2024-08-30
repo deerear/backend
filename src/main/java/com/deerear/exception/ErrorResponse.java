@@ -1,4 +1,4 @@
-package com.deerear.deerear.exception;
+package com.deerear.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -1,7 +1,7 @@
-package com.deerear.deerear.controller;
+package com.deerear.app.controller;
 
-import com.deerear.deerear.dto.ResponseEstimateDTO;
-import com.deerear.deerear.service.ResponseEstimateService;
+import com.deerear.app.dto.ResponseEstimateDTO;
+import com.deerear.app.service.ResponseEstimateService;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import lombok.RequiredArgsConstructor;

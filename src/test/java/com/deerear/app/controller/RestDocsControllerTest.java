@@ -1,7 +1,6 @@
-package com.deerear.deerear.controller;
+package com.deerear.app.controller;
 
-import com.deerear.app.controller.RestDocsController;
-import com.deerear.deerear.base.AbstractRestDocsTests;
+import com.deerear.base.AbstractRestDocsTests;
 import com.deerear.app.dto.RestDocsRequestDTO;
 import com.deerear.app.dto.RestDocsResponseDTO;
 import com.deerear.app.service.RestDocsService;

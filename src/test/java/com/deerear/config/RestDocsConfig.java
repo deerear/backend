@@ -1,4 +1,4 @@
-package com.deerear.deerear.config;
+package com.deerear.config;
 
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;

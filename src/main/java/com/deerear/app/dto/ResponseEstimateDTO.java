@@ -1,4 +1,4 @@
-package com.deerear.deerear.dto;
+package com.deerear.app.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;

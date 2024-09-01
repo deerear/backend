@@ -63,3 +63,9 @@ out/
 
 # VS Code files
 .vscode/
+
+# Ignore application
+application.properties
+
+# Ignore test code
+/src/test/

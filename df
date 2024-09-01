@@ -1,0 +1,31 @@
+[33md81667a[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mdevelop[m[33m, [m[1;31morigin/develop[m[33m, [m[1;32madd-api-prefix[m[33m)[m Merge pull request #9 from deerear/feature/security-jwt
+[33mf3ea0b4[m[33m ([m[1;31morigin/feature/security-jwt[m[33m, [m[1;32mtemp-branch[m[33m)[m feat: Implement JWT authentication
+[33mf79ddeb[m feat: Complete JWT and Security configuration
+[33m064128e[m Merge pull request #8 from deerear/feature/restructure
+[33m38e2b9c[m fix: ㅈㅅ 상위 컴포넌트 스캔
+[33m356f52c[m Merge pull request #7 from deerear/feature/restructure
+[33m25b37cf[m fix: 패키지 구조 변경
+[33m85135de[m Merge pull request #6 from deerear/feature/exception
+[33m5a1cff0[m[33m ([m[1;31morigin/feature/exception[m[33m)[m fix: 이름 변경 DearException* -> BizException* ErrorResponse 내 status 제거
+[33m51e2ae4[m feat: 커스텀 익셉션 생성
+[33m23470b5[m Merge pull request #5 from deerear/feature/logging
+[33m6c97c57[m[33m ([m[1;31morigin/feature/logging[m[33m)[m fix: create static variable for path
+[33m2147264[m feat: AOP Logging System
+[33md9bec51[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m Merge pull request #4 from deerear/merge-develop-into-main
+[33m1301a4b[m Merge pull request #3 from deerear/feature/new-structure
+[33mf0bb7a1[m Update project structure
+[33mab96d5f[m Merge pull request #2 from deerear/feature/docker
+[33m2d42082[m fix: cd
+[33m0663729[m fix: cicd
+[33md11db56[m Merge pull request #1 from deerear/feature/docker
+[33m9f7ffe0[m fix: chmod
+[33mdd0b7af[m fix: gradle auth
+[33m4a2ae21[m fix: gradle path
+[33m83078d3[m fix: gradlew mod
+[33mfe4a597[m fix: Dockerfile
+[33m4a6fbd4[m feat: branch init
+[33m299cfb7[m Swagger 추가 및 MVC패턴 적용
+[33mf4eb0b9[m Resolved merge conflict in .gitignore
+[33m435db94[m #FEAT: initial project setup and first push
+[33m20e182a[m #FEAT: initial project setup and first push
+[33mfac0e7e[m Initial commit

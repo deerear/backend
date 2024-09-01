@@ -1,8 +1,8 @@
-package com.deerear.deerear.controller;
+package com.deerear.app.controller;
 
-import com.deerear.deerear.dto.RestDocsRequestDTO;
-import com.deerear.deerear.dto.RestDocsResponseDTO;
-import com.deerear.deerear.service.RestDocsService;
+import com.deerear.app.dto.RestDocsRequestDTO;
+import com.deerear.app.dto.RestDocsResponseDTO;
+import com.deerear.app.service.RestDocsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

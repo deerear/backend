@@ -1,7 +1,7 @@
-package com.deerear.deerear.service;
+package com.deerear.app.service;
 
-import com.deerear.deerear.dto.RestDocsRequestDTO;
-import com.deerear.deerear.dto.RestDocsResponseDTO;
+import com.deerear.app.dto.RestDocsRequestDTO;
+import com.deerear.app.dto.RestDocsResponseDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

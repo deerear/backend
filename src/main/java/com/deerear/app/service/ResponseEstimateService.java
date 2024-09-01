@@ -1,6 +1,5 @@
-package com.deerear.deerear.service;
+package com.deerear.app.service;
 
-import com.deerear.deerear.repository.ResponseEstimateRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

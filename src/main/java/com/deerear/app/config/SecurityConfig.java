@@ -1,4 +1,4 @@
-package com.deerear.deerear.config;
+package com.deerear.app.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;

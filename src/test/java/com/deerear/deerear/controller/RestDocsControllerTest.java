@@ -1,9 +1,10 @@
 package com.deerear.deerear.controller;
 
+import com.deerear.app.controller.RestDocsController;
 import com.deerear.deerear.base.AbstractRestDocsTests;
-import com.deerear.deerear.dto.RestDocsRequestDTO;
-import com.deerear.deerear.dto.RestDocsResponseDTO;
-import com.deerear.deerear.service.RestDocsService;
+import com.deerear.app.dto.RestDocsRequestDTO;
+import com.deerear.app.dto.RestDocsResponseDTO;
+import com.deerear.app.service.RestDocsService;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;

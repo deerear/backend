@@ -1,4 +1,4 @@
-package com.deerear.deerear.config;
+package com.deerear.app.config;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.info.Info;

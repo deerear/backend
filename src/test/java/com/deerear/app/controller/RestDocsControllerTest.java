@@ -5,7 +5,10 @@ import com.deerear.app.dto.RestDocsRequestDTO;
 import com.deerear.app.dto.RestDocsResponseDTO;
 import com.deerear.app.service.RestDocsService;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureWebMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -30,7 +33,9 @@ import static org.springframework.restdocs.request.RequestDocumentation.queryPar
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.mockito.BDDMockito.given;
-@WebMvcTest(RestDocsController.class)
+
+@AutoConfigureMockMvc
+@SpringBootTest
 public class RestDocsControllerTest extends AbstractRestDocsTests {
 
     @MockBean

@@ -1,45 +1,52 @@
 package com.deerear.deerear.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.deerear.deerear.jwt.JwtAuthenticationFilter;
+import com.deerear.deerear.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
+    private final JwtTokenProvider jwtTokenProvider;
 
-    private final ObjectMapper objectMapper;
-
-    // 특정 HTTP 요청에 대한 웹 기반 보안 구성
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(csrf -> csrf.disable()) // CSRF 비활성화
-                .httpBasic(basic -> basic.disable()) // HTTP Basic 인증 비활성화
-                .formLogin(form -> form.disable()) // 폼 로그인 비활성화
-                .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/configuration/ui", "/configuration/security").permitAll()
-                        .requestMatchers("/signup", "/", "/login").permitAll() // 공용 페이지 접근 허용 (end-point는 추후 논의)
-                        .anyRequest().authenticated()) // 나머지 요청은 인증 필요
-                .logout(logout -> logout
-                        .logoutSuccessUrl("/login")
-                        .invalidateHttpSession(true))
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-        return http.build();
+        return http
+                // REST API이므로 CSRF 보안 비활성화
+                .csrf(csrf -> csrf.disable())
+                // JWT를 사용하기 때문에 세션을 사용하지 않음
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(authz -> authz
+                        // 해당 API에 대해서는 모든 요청을 허가
+                        .requestMatchers("/members/sign-up").permitAll()	// ⭐
+                        .requestMatchers("/members/sign-in").permitAll()
+                        .requestMatchers("/members/login").permitAll()
+                        // 리프레시 토큰 API는 인증된 사용자만 접근 가능
+                        .requestMatchers("/api/token/refresh").permitAll()
+                        // ADMIN 권한이 있어야 요청할 수 있음
+                        .requestMatchers("/api/admins/**").hasRole("ADMIN")
+                        // USER 권한이 있어야 요청할 수 있음
+                        .requestMatchers("/members/test").hasRole("USER")
+                        // 이 밖에 모든 요청에 대해서 인증을 필요로 한다는 설정
+                        .anyRequest().authenticated()
+                )
+                // JWT 인증을 위하여 직접 구현한 필터를 UsernamePasswordAuthenticationFilter 전에 실행
+                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
+                .build();
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+        return new BCryptPasswordEncoder(); //
     }
 }

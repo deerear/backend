@@ -34,7 +34,6 @@ public class TokenController {
 
         // 리프레시 토큰의 유효성 검증
         if (!jwtTokenProvider.validateToken(refreshToken)) {
-            log.error("Invalid refresh token: {}", refreshToken);
             throw new BizException("리프레시 토큰이 유효하지 않습니다.", ErrorCode.INVALID_INPUT, "refreshToken: " + refreshToken);
         }
 
@@ -43,7 +42,6 @@ public class TokenController {
         try {
             username = jwtTokenProvider.getUsernameFromToken(refreshToken);
         } catch (RuntimeException e) {
-            log.error("Error extracting username from refresh token", e);
             throw new BizException("리프레시 토큰에서 사용자 정보를 추출할 수 없습니다.", ErrorCode.INVALID_INPUT, "refreshToken: " + refreshToken);
         }
 

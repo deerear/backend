@@ -29,17 +29,17 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authz -> authz
                         // 해당 API에 대해서는 모든 요청을 허가
                         // permitAll 필요한 API 추가하길 바람.
-                        .requestMatchers("/members/sign-up").permitAll()	// ⭐
-                        .requestMatchers("/members/sign-in").permitAll()
-                        .requestMatchers("/members/login").permitAll()
                         // restdocs
                         .requestMatchers("/docs/**").permitAll()
+                        .requestMatchers("/api/members/sign-up").permitAll()	// ⭐
+                        .requestMatchers("/api/members/sign-in").permitAll()
+                        .requestMatchers("/api/members/login").permitAll()
                         // 리프레시 토큰 API는 인증된 사용자만 접근 가능
                         .requestMatchers("/api/token/refresh").permitAll()
                         // ADMIN 권한이 있어야 요청할 수 있음
                         .requestMatchers("/api/admins/**").hasRole("ADMIN")
                         // USER 권한이 있어야 요청할 수 있음
-                        .requestMatchers("/members/test").hasRole("USER")
+                        .requestMatchers("/api/members/test").hasRole("USER")
                         // 이 밖에 모든 요청에 대해서 인증을 필요로 한다는 설정
                         .anyRequest().authenticated()
                 )

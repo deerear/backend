@@ -1,7 +1,7 @@
-package com.deerear.deerear.config;
+package com.deerear.config;
 
-import com.deerear.deerear.jwt.JwtAuthenticationFilter;
-import com.deerear.deerear.jwt.JwtTokenProvider;
+import com.deerear.jwt.JwtAuthenticationFilter;
+import com.deerear.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,6 +28,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authz -> authz
                         // 해당 API에 대해서는 모든 요청을 허가
+                        // permitAll 필요한 API 추가하길 바람.
                         .requestMatchers("/members/sign-up").permitAll()	// ⭐
                         .requestMatchers("/members/sign-in").permitAll()
                         .requestMatchers("/members/login").permitAll()

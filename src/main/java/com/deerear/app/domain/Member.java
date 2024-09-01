@@ -1,4 +1,4 @@
-package com.deerear.deerear.domain;
+package com.deerear.app.domain;
 
 import jakarta.persistence.*;
 import lombok.*;

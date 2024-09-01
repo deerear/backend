@@ -1,4 +1,4 @@
-package com.deerear.deerear.jwt;
+package com.deerear.jwt;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

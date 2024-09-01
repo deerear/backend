@@ -1,6 +1,6 @@
-package com.deerear.deerear.dto;
+package com.deerear.app.dto;
 
-import com.deerear.deerear.domain.Member;
+import com.deerear.app.domain.Member;
 import lombok.*;
 
 @Getter

@@ -1,6 +1,6 @@
-package com.deerear.deerear.repository;
+package com.deerear.app.repository;
 
-import com.deerear.deerear.domain.Member;
+import com.deerear.app.domain.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

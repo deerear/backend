@@ -1,6 +1,6 @@
-package com.deerear.deerear.jwt;
+package com.deerear.jwt;
 
-import com.deerear.deerear.dto.JwtToken;
+import com.deerear.app.dto.JwtToken;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -16,7 +16,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -52,8 +51,8 @@ public class JwtTokenProvider {
         // RefreshToken 생성 - 사용자 이름을 기반으로 생성
         String refreshToken = generateRefreshToken(username, now);
 
-        log.debug("Generated AccessToken: {}", accessToken);
-        log.debug("Generated RefreshToken: {}", refreshToken);
+      //  log.debug("Generated AccessToken: {}", accessToken);
+       // log.debug("Generated RefreshToken: {}", refreshToken);
 
         return JwtToken.builder()
                 .grantType("Bearer")
@@ -76,7 +75,7 @@ public class JwtTokenProvider {
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
 
-        log.debug("Generated AccessToken: {}", token);
+       // log.debug("Generated AccessToken: {}", token);
         return token;
     }
 

@@ -1,17 +1,17 @@
-package com.deerear.deerear.controller;
+package com.deerear.app.controller;
 
-import com.deerear.deerear.domain.Member;
-import com.deerear.deerear.dto.TokenRequestDto;
-import com.deerear.deerear.dto.TokenResponseDto;
-import com.deerear.deerear.jwt.JwtTokenProvider;
-import com.deerear.deerear.repository.MemberRepository;
+import com.deerear.app.domain.Member;
+import com.deerear.app.dto.TokenRequestDto;
+import com.deerear.app.dto.TokenResponseDto;
+import com.deerear.app.repository.MemberRepository;
+import com.deerear.constant.ErrorCode;
+import com.deerear.exception.BizException;
+import com.deerear.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,43 +35,31 @@ public class TokenController {
         // 리프레시 토큰의 유효성 검증
         if (!jwtTokenProvider.validateToken(refreshToken)) {
             log.error("Invalid refresh token: {}", refreshToken);
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new TokenResponseDto("리프레시 토큰이 유효하지 않습니다.", null));
+            throw new BizException("리프레시 토큰이 유효하지 않습니다.", ErrorCode.INVALID_INPUT, "refreshToken: " + refreshToken);
         }
 
-        // 리프레시 토큰에서 사용자 정보 추출 (권한 없이 사용자 정보만 추출)
+        // 리프레시 토큰에서 사용자 정보 추출
         String username;
         try {
-            username = jwtTokenProvider.getUsernameFromToken(refreshToken);  // 사용자 이름만 추출하는 메서드
+            username = jwtTokenProvider.getUsernameFromToken(refreshToken);
         } catch (RuntimeException e) {
             log.error("Error extracting username from refresh token", e);
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new TokenResponseDto("리프레시 토큰에서 사용자 정보를 추출할 수 없습니다.", null));
+            throw new BizException("리프레시 토큰에서 사용자 정보를 추출할 수 없습니다.", ErrorCode.INVALID_INPUT, "refreshToken: " + refreshToken);
         }
 
-        log.debug("Username from refresh token: {}", username);
-
-        // DB에 저장된 리프레시 토큰과 요청된 리프레시 토큰의 일치 여부 확인 (교차 검증)
+        // DB에 저장된 리프레시 토큰과 요청된 리프레시 토큰의 일치 여부 확인
         Member member = memberRepository.findByUsername(username)
-                .orElseThrow(() -> {
-                    log.error("User not found: {}", username);
-                    return new UsernameNotFoundException("해당하는 회원을 찾을 수 없습니다.");
-                });
+                .orElseThrow(() -> new BizException("해당하는 회원을 찾을 수 없습니다.", ErrorCode.USER_NOT_FOUND, "username: " + username));
 
         if (!refreshToken.equals(member.getRefreshToken())) {
-            log.error("Refresh token mismatch for user: {}", username);
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new TokenResponseDto("리프레시 토큰이 일치하지 않습니다.", null));
+            throw new BizException("리프레시 토큰이 일치하지 않습니다.", ErrorCode.INVALID_INPUT, "refreshToken: " + refreshToken);
         }
 
         long now = System.currentTimeMillis();
-        // Username을 기반으로 Authentication 객체 생성 (권한 정보를 설정)
         Authentication authentication = new UsernamePasswordAuthenticationToken(username, null, new ArrayList<>());
 
-        // 새로운 액세스 토큰 생성
+        // 새로운 액세스 토큰 및 리프레시 토큰 생성
         String newAccessToken = jwtTokenProvider.generateAccessToken(authentication, now);
-
-        // 새로운 리프레시 토큰 생성
         String newRefreshToken = jwtTokenProvider.generateRefreshToken(username, now);
 
         // 리프레시 토큰을 새로 발급받아 DB에 저장
@@ -80,7 +68,7 @@ public class TokenController {
 
         TokenResponseDto response = TokenResponseDto.builder()
                 .accessToken(newAccessToken)
-                .refreshToken(newRefreshToken) // 새로 발급된 리프레시 토큰
+                .refreshToken(newRefreshToken)
                 .build();
 
         return ResponseEntity.ok(response);

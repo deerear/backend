@@ -4,30 +4,6 @@ on:
     branches: ["develop"]
 
 jobs:
-  # tests:
-  #   name: Unit tests
-
-  #   runs-on: ubuntu-latest
-
-  #   steps:
-
-  #     - uses: actions/checkout@v3
-
-  #     - name: Set up JDK
-  #       uses: actions/setup-java@v3
-  #       with:
-  #         java-version: '17'
-
-  #     - name: Cache Dependency
-  #       uses: actions/cache@v1
-  #       with:
-  #         path: ~/.m2
-  #         key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-  #         restore-keys: ${{ runner.os }}-m2
-
-  #     - name: Run Tests
-  #       run: mvn -B test
-  
   build:
     runs-on: ubuntu-latest
 
@@ -39,7 +15,7 @@ jobs:
       with:
         java-version: '17'
         distribution: 'temurin'
-        
+
     - name: Build application
       run: |
         chmod +x ./gradlew

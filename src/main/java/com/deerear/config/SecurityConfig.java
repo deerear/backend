@@ -32,6 +32,8 @@ public class SecurityConfig {
                         .requestMatchers("/members/sign-up").permitAll()	// ⭐
                         .requestMatchers("/members/sign-in").permitAll()
                         .requestMatchers("/members/login").permitAll()
+                        // restdocs
+                        .requestMatchers("/docs/**").permitAll()
                         // 리프레시 토큰 API는 인증된 사용자만 접근 가능
                         .requestMatchers("/api/token/refresh").permitAll()
                         // ADMIN 권한이 있어야 요청할 수 있음

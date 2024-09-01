@@ -64,8 +64,8 @@ out/
 # VS Code files
 .vscode/
 
-# Ignore application
-application.properties
 
-# Ignore test code
-/src/test/
+# Ignore all Java files in the test directory
+
+# Except for the specific file you want to track
+src/test/java/com/deerear/app/DeerearApplicationTests.java

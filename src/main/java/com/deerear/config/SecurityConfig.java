@@ -31,6 +31,7 @@ public class SecurityConfig {
                         // permitAll 필요한 API 추가하길 바람.
                         // restdocs
                         .requestMatchers("/docs/**").permitAll()
+                        .requestMatchers("/restdoc/**").permitAll()
                         .requestMatchers("/api/members/sign-up").permitAll()	// ⭐
                         .requestMatchers("/api/members/sign-in").permitAll()
                         .requestMatchers("/api/members/login").permitAll()

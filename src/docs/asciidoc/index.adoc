@@ -1,0 +1,62 @@
+= DEEREAR
+REST Docs
+:doctype: book
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+:seclinks:
+
+[[overview]]
+== 1. Overview
+
+[[host]]
+=== Host
+|===
+| host/ip | 비고
+
+| `localhost` | `Individual PC`
+|===
+
+
+[[http-status-codes]]
+=== HTTP Status Codes
+
+|===
+| 상태 코드 | 설명
+
+| `200 OK`
+| 성공 (조회)
+
+| `201 Created`
+| 성공 (생성)
+
+| `202 Accepted`
+| 성공 (수정)
+
+| `204 No Content`
+| 성공 (삭제)
+
+| `400 Bad Request`
+| 에러 (잘못된 요청)
+
+| `401 Unauthorized`
+| 에러 (권한이 없음)
+
+| `403 Forbidden`
+| 에러 (금지된 요청)
+
+| `404 Not Found`
+| 에러 (존재하지 않는 리소스)
+
+| `500 Internal Server Error`
+| 에러 (서버 에러)
+|===
+
+
+== 2. APIs link:rest-docs-controller.html[(Example)]
+=== 1) User API
+=== 2) Board API
+=== 3) Comment API
+
+
+== 3. Errors link:https://www.google.com[(Todo)]

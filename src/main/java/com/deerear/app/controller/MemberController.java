@@ -24,7 +24,7 @@ public class MemberController {
 
     @PostMapping("/sign-in")
     public ResponseEntity<JwtToken> signIn(@RequestBody SignInDto signInDto) {
-        JwtToken jwtToken = memberService.signIn(signInDto.getUsername(), signInDto.getPassword());
+        JwtToken jwtToken = memberService.signIn(signInDto.getEmail(), signInDto.getPassword());
         return ResponseEntity.ok(jwtToken);
     }
 
@@ -32,10 +32,5 @@ public class MemberController {
     public ResponseEntity<MemberDto> signUp(@RequestBody SignUpDto signUpDto) {
         MemberDto savedMemberDto = memberService.signUp(signUpDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedMemberDto);
-    }
-
-    @PostMapping("/test")
-    public ResponseEntity<String> test() {
-        return ResponseEntity.ok("success");
     }
 }

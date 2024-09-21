@@ -38,27 +38,27 @@ public class TokenController {
         }
 
         // 리프레시 토큰에서 사용자 정보 추출
-        String username;
+        String email;
         try {
-            username = jwtTokenProvider.getUsernameFromToken(refreshToken);
+            email = jwtTokenProvider.getUsernameFromToken(refreshToken);
         } catch (RuntimeException e) {
             throw new BizException("리프레시 토큰에서 사용자 정보를 추출할 수 없습니다.", ErrorCode.INVALID_INPUT, "refreshToken: " + refreshToken);
         }
 
         // DB에 저장된 리프레시 토큰과 요청된 리프레시 토큰의 일치 여부 확인
-        Member member = memberRepository.findByUsername(username)
-                .orElseThrow(() -> new BizException("해당하는 회원을 찾을 수 없습니다.", ErrorCode.USER_NOT_FOUND, "username: " + username));
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(() -> new BizException("해당하는 회원을 찾을 수 없습니다.", ErrorCode.USER_NOT_FOUND, "username: " + email));
 
         if (!refreshToken.equals(member.getRefreshToken())) {
             throw new BizException("리프레시 토큰이 일치하지 않습니다.", ErrorCode.INVALID_INPUT, "refreshToken: " + refreshToken);
         }
 
         long now = System.currentTimeMillis();
-        Authentication authentication = new UsernamePasswordAuthenticationToken(username, null, new ArrayList<>());
+        Authentication authentication = new UsernamePasswordAuthenticationToken(email, null, new ArrayList<>());
 
         // 새로운 액세스 토큰 및 리프레시 토큰 생성
         String newAccessToken = jwtTokenProvider.generateAccessToken(authentication, now);
-        String newRefreshToken = jwtTokenProvider.generateRefreshToken(username, now);
+        String newRefreshToken = jwtTokenProvider.generateRefreshToken(email, now);
 
         // 리프레시 토큰을 새로 발급받아 DB에 저장
         member.setRefreshToken(newRefreshToken);

@@ -10,30 +10,22 @@ import lombok.*;
 @Builder
 public class MemberDto {
 
-    private Long id;
-    private String username;
-    private String nickname;
-    private String address;
-    private String phone;
-    private String profileImg;
+    private String email;  // 이메일
+    private String password; // 비밀번호 추가
+    private String nickname; // 닉네임
 
     static public MemberDto toDto(Member member) {
         return MemberDto.builder()
-                .id(member.getId())
-                .username(member.getUsername())
+                .email(member.getEmail())
                 .nickname(member.getNickname())
-                .address(member.getAddress())
-                .phone(member.getPhone())
-                .profileImg(member.getProfileImg()).build();
+                .build();
     }
 
     public Member toEntity() {
         return Member.builder()
-                .id(id)
-                .username(username)
+                .email(email)
+                .password(password) // 비밀번호 설정
                 .nickname(nickname)
-                .address(address)
-                .phone(phone)
-                .profileImg(profileImg).build();
+                .build();
     }
 }

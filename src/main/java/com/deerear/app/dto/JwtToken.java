@@ -2,10 +2,10 @@ package com.deerear.app.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 
 @Builder
-@Data
+@Getter
 @AllArgsConstructor
 public class JwtToken {
     private String grantType;

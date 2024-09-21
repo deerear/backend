@@ -1,6 +1,8 @@
 package com.deerear.jwt;
 
 import com.deerear.app.dto.JwtToken;
+import com.deerear.constant.ErrorCode;
+import com.deerear.exception.BizException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -62,21 +64,26 @@ public class JwtTokenProvider {
     }
 
     public String generateAccessToken(Authentication authentication, long now) {
+        // 권한 정보 추출
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
 
-        Date accessTokenExpiresIn = new Date(now + 1800000); // 30분
+        // 사용자 이메일 (혹은 다른 식별자를 Subject로 설정)
+        String subject = authentication.getName();
 
-        String token = Jwts.builder()
-                .setSubject(authentication.getName())
-                .claim("auth", authorities)  // 권한 정보를 포함
-                .setExpiration(accessTokenExpiresIn)
-                .signWith(key, SignatureAlgorithm.HS256)
+        // 만료 시간 설정 (30분)
+        Date accessTokenExpiresIn = new Date(now + 1800000); // 30분 후 만료
+
+        // 토큰 생성
+        return Jwts.builder()
+                .setSubject(subject)  // sub 클레임
+                .claim("auth", authorities)  // 권한 정보를 포함한 auth 클레임 추가
+                .setIssuedAt(new Date(now))  // iat 클레임 (발급 시간)
+                .setExpiration(accessTokenExpiresIn)  // exp 클레임 (만료 시간)
+                .setIssuer("deerear")  // iss 클레임
+                .signWith(key, SignatureAlgorithm.HS256)  // 서명 알고리즘
                 .compact();
-
-       // log.debug("Generated AccessToken: {}", token);
-        return token;
     }
 
     // RefreshToken 생성 메서드
@@ -103,7 +110,7 @@ public class JwtTokenProvider {
                 // 리프레시 토큰일 경우 권한 정보 체크하지 않음
                 return new UsernamePasswordAuthenticationToken(claims.getSubject(), null, null);
             } else {
-                throw new RuntimeException("권한 정보가 없는 토큰입니다.");
+                throw new BizException("권한 정보가 없는 토큰입니다.", ErrorCode.INVALID_INPUT, "토큰: " + token);
             }
         }
 
@@ -136,6 +143,8 @@ public class JwtTokenProvider {
             return false;
         }
     }
+
+
     // 토큰 정보를 검증하는 메서드
     public boolean validateToken(String token) {
         try {

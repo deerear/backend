@@ -19,6 +19,9 @@ jobs:
     - name: Build application
       env:
         JWT_SECRET_KEY: ${{secrets.JWT_SECRET_KEY}}
+        SPRING_DATASOURCE_URL: ${{secrets.SPRING_DATASOURCE_URL}}
+        SPRING_DATASOURCE_USERNAME: ${{secrets.SPRING_DATASOURCE_USERNAME}}
+        SPRING_DATASOURCE_PASSWORD: ${{secrets.SPRING_DATASOURCE_PASSWORD}}
       run: |
         chmod +x ./gradlew
         ./gradlew build

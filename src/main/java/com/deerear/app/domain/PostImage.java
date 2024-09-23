@@ -14,8 +14,9 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @EqualsAndHashCode(of = "id")
+@ToString
 @Table(name = "post_images")
-public class PostImage {
+public class PostImage extends ModifiableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -27,10 +28,4 @@ public class PostImage {
 
     @Column(name = "image_url", nullable = false)
     private String imageUrl;
-
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
 }

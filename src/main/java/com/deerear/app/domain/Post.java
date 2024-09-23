@@ -15,16 +15,17 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @EqualsAndHashCode(of = "id")
+@ToString
 @Table(name = "posts")
-public class Post {
+public class Post extends ModifiableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(updatable = false, nullable = false, unique = true)
     private UUID id;
 
-    @Column(name = "member_id", nullable = false)
-    private UUID memberId;
+    @ManyToOne
+    Member member;
 
     @Column(nullable = false)
     private String title;
@@ -37,12 +38,6 @@ public class Post {
 
     @Column
     private BigDecimal longitude;
-
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
-
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
 
     @Column(name = "comment_count", nullable = false)
     private Long commentCount;

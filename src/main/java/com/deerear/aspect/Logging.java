@@ -21,9 +21,9 @@ public class Logging {
     private static final String STARTED_AT = "startedAt";
     private static final String CALL_COUNT = "callCount";
 
-    private static final String CONTROLLER = "execution(* com.deerear.deerear.controller..*.*(..))";
-    private static final String SERVICE = "execution(* com.deerear.deerear.service..*.*(..))";
-    private static final String CONTROLLER_OR_SERVICE = "execution(* com.deerear.deerear.controller..*.*(..)) || execution(* com.deerear.deerear.service..*.*(..))";
+    private static final String CONTROLLER = "execution(* com.deerear.app.controller..*.*(..))";
+    private static final String SERVICE = "execution(* com.deerear.app.service..*.*(..))";
+    private static final String CONTROLLER_OR_SERVICE = "execution(* com.deerear.app.controller..*.*(..)) || execution(* com.deerear.app.service..*.*(..))";
 
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 

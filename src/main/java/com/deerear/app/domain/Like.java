@@ -12,24 +12,22 @@ import java.util.UUID;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
+@Data
 @EqualsAndHashCode(of = "id")
 @Table(name = "likes")
-public class Like {
+public class Like extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(updatable = false, nullable = false, unique = true)
     private UUID id;
 
-    @Column(name = "member_id", nullable = false)
-    private UUID memberId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    Member member;
 
-    @Column(name = "post_id")
-    private UUID postId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    Post post;
 
-    @Column(name = "comment_id")
-    private UUID commentId;
-
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private java.time.LocalDateTime createdAt;
+    @ManyToOne
+    Comment comment;
 }

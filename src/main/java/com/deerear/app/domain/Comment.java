@@ -12,9 +12,10 @@ import java.util.UUID;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-@EqualsAndHashCode(of = "id")
+@EqualsAndHashCode(of = "id", callSuper = false)
+@ToString
 @Table(name = "comments")
-public class Comment {
+public class Comment extends ModifiableEntity {
 
     @Id
     @GeneratedValue(generator = "UUID")
@@ -22,21 +23,15 @@ public class Comment {
     @Column(updatable = false, nullable = false, unique = true)
     private UUID id;
 
-    @Column(name = "post_id", nullable = false)
-    private UUID postId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    Member member;
 
-    @Column(name = "member_id", nullable = false)
-    private UUID memberId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    Post post;
 
     @Column(nullable = false)
     private String content;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private java.time.LocalDateTime createdAt;
-
-    @Column(name = "updated_at")
-    private java.time.LocalDateTime updatedAt;
-
     @Column(name = "like_count", nullable = false)
-    private Long likeCount;
+    private long likeCount;
 }

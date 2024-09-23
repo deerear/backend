@@ -14,8 +14,9 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @EqualsAndHashCode(of = "id")
+@ToString
 @Table(name = "members")
-public class Member {
+public class Member extends ModifiableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -35,21 +36,4 @@ public class Member {
 
     @Column(name = "refresh_token")
     private String refreshToken;
-
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;
-
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
-    }
 }

@@ -23,10 +23,10 @@ public class Like extends BaseEntity {
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    Member member;
+    private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    Post post;
+    private Post post;
 
     @ManyToOne
     Comment comment;

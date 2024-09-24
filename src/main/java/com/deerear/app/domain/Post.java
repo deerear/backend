@@ -25,7 +25,7 @@ public class Post extends ModifiableEntity {
     private UUID id;
 
     @ManyToOne
-    Member member;
+    private Member member;
 
     @Column(nullable = false)
     private String title;

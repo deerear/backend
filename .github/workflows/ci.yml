@@ -6,7 +6,15 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: ${{secrets.DB_NAME}}
+          POSTGRES_USER: ${{secrets.SPRING_DATASOURCE_USERNAME}}
+          POSTGRES_PASSWORD: ${{secrets.SPRING_DATASOURCE_PASSWORD}}
+        ports:
+          - 5432:5432
     steps:
     - uses: actions/checkout@v3
     

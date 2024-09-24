@@ -24,10 +24,10 @@ public class Comment extends ModifiableEntity {
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    Member member;
+    private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    Post post;
+    private Post post;
 
     @Column(nullable = false)
     private String content;

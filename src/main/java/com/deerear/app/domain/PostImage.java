@@ -23,8 +23,8 @@ public class PostImage extends ModifiableEntity {
     @Column(updatable = false, nullable = false, unique = true)
     private UUID id;
 
-    @Column(name = "post_id", nullable = false)
-    private UUID postId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Post post;
 
     @Column(name = "image_url", nullable = false)
     private String imageUrl;

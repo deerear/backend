@@ -28,6 +28,6 @@ public class Like extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private Post post;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     Comment comment;
 }

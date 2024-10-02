@@ -34,9 +34,12 @@ public class Post extends ModifiableEntity {
     private String content;
 
     @Column
+    private String thumbnail;
+
+    @Column(precision = 10, scale = 7)
     private BigDecimal latitude;
 
-    @Column
+    @Column(precision = 10, scale = 7)
     private BigDecimal longitude;
 
     @Column(name = "comment_count", nullable = false)
@@ -44,4 +47,7 @@ public class Post extends ModifiableEntity {
 
     @Column(name = "like_count", nullable = false)
     private long likeCount;
+
+    @Column(nullable = false)
+    private Boolean isDeleted;
 }

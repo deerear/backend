@@ -60,7 +60,8 @@ dependencies {
 	// Restdoc
 	asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor:3.0.1'
 
-
+	// Validation
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
 }
 
 ext {

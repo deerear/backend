@@ -14,7 +14,7 @@ import java.util.UUID;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-@EqualsAndHashCode(of = "id")
+@EqualsAndHashCode(of = "id", callSuper = false)
 @ToString
 @Table(name = "posts")
 public class Post extends ModifiableEntity {
@@ -24,7 +24,7 @@ public class Post extends ModifiableEntity {
     @Column(updatable = false, nullable = false, unique = true)
     private UUID id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
 
     @Column(nullable = false)
@@ -40,8 +40,8 @@ public class Post extends ModifiableEntity {
     private BigDecimal longitude;
 
     @Column(name = "comment_count", nullable = false)
-    private Long commentCount;
+    private long commentCount;
 
     @Column(name = "like_count", nullable = false)
-    private Long likeCount;
+    private long likeCount;
 }

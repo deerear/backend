@@ -13,7 +13,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @Data
-@EqualsAndHashCode(of = "id")
+@EqualsAndHashCode(of = "id", callSuper = false)
 @Table(name = "likes")
 public class Like extends BaseEntity {
 
@@ -28,6 +28,6 @@ public class Like extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private Post post;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     Comment comment;
 }

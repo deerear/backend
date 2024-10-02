@@ -27,7 +27,7 @@ public class MemberService {
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
 
-    @Transactional(readOnly = true)
+    @Transactional
     public JwtToken signIn(String email, String password) {
         // 1. 검증 단계
         validateSignIn(email, password);

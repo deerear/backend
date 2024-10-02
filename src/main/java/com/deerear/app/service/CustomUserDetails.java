@@ -7,20 +7,23 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.Collections;
 
 @Getter
 public class CustomUserDetails implements UserDetails {
     private final Member user;
-    private final Collection<? extends GrantedAuthority> authorities;  // 권한 정보
 
-    public CustomUserDetails(Member user, Collection<? extends GrantedAuthority> authorities) {
+    private CustomUserDetails(Member user) {
         this.user = user;
-        this.authorities = authorities;
+    }
+
+    public static CustomUserDetails of(Member user) {
+        return new CustomUserDetails(user);
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return authorities;
+        return Collections.emptyList();
     }
 
     @Override
@@ -30,6 +33,6 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        return user.getNickname();
+        return user.getEmail();
     }
 }

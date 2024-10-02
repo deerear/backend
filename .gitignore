@@ -1,5 +1,6 @@
+images
 .env
-
+*.html
 # Compiled class file
 *.class
 

@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -20,10 +21,10 @@ public class DmController {
 
     private final DmService dmService;
 
-    @PostMapping("/api/dm")
+    @PostMapping("/api/dms")
     public void createDm(@AuthenticationPrincipal CustomUserDetails userDetails, String otherUserNickname) {
-
     }
+
 
     @MessageMapping("/sub/{dmId}")
     public void sendDm(@AuthenticationPrincipal CustomUserDetails member, UUID dmId, String text){

@@ -23,5 +23,4 @@ public class Dm extends BaseEntity {
 
     private String lastMessage;
 
-
 }

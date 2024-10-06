@@ -27,6 +27,7 @@ repositories {
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web' //WEB
+	implementation 'org.springframework.boot:spring-boot-starter-websocket' //WEBSOCKET
 	implementation 'org.springframework.boot:spring-boot-starter-aop' //AOP
 
 	// JWT

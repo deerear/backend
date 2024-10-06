@@ -1,19 +1,22 @@
 package com.deerear.app.dto;
 
-import io.swagger.v3.oas.annotations.media.Schema;
+
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
-public class ResponseEstimateDTO {
+public class RestDocsResponseDTO {
 
     @NotNull
-    @Schema(description = "아이디", example = "아이디 입니다.")
     private Long id;
 
-    @Schema(description = "이름", example = "이름 입니다.")
     private String name;
     private String description;
     private Double estimateValue;

@@ -1,5 +1,6 @@
 package com.deerear.config;
 
+import com.deerear.app.service.CustomUserDetailsService;
 import com.deerear.jwt.JwtAuthenticationFilter;
 import com.deerear.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final JwtTokenProvider jwtTokenProvider;
+    private final CustomUserDetailsService customUserDetailsService;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -29,6 +31,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authz -> authz
                         // 해당 API에 대해서는 모든 요청을 허가
                         // permitAll 필요한 API 추가하길 바람.
+                        // restdocs
+                        .requestMatchers("/docs/**").permitAll()
+                        .requestMatchers("/restdoc/**").permitAll()
                         .requestMatchers("/api/members/sign-up").permitAll()	// ⭐
                         .requestMatchers("/api/members/sign-in").permitAll()
                         .requestMatchers("/api/members/login").permitAll()
@@ -36,13 +41,12 @@ public class SecurityConfig {
                         .requestMatchers("/api/token/refresh").permitAll()
                         // ADMIN 권한이 있어야 요청할 수 있음
                         .requestMatchers("/api/admins/**").hasRole("ADMIN")
-                        // USER 권한이 있어야 요청할 수 있음
-                        .requestMatchers("/api/members/test").hasRole("USER")
                         // 이 밖에 모든 요청에 대해서 인증을 필요로 한다는 설정
+                        .requestMatchers("/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 // JWT 인증을 위하여 직접 구현한 필터를 UsernamePasswordAuthenticationFilter 전에 실행
-                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider, customUserDetailsService), UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 

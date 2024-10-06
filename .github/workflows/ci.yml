@@ -4,33 +4,17 @@ on:
     branches: ["develop"]
 
 jobs:
-  # tests:
-  #   name: Unit tests
-
-  #   runs-on: ubuntu-latest
-
-  #   steps:
-
-  #     - uses: actions/checkout@v3
-
-  #     - name: Set up JDK
-  #       uses: actions/setup-java@v3
-  #       with:
-  #         java-version: '17'
-
-  #     - name: Cache Dependency
-  #       uses: actions/cache@v1
-  #       with:
-  #         path: ~/.m2
-  #         key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-  #         restore-keys: ${{ runner.os }}-m2
-
-  #     - name: Run Tests
-  #       run: mvn -B test
-  
   build:
     runs-on: ubuntu-latest
-
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: ${{secrets.DB_NAME}}
+          POSTGRES_USER: ${{secrets.SPRING_DATASOURCE_USERNAME}}
+          POSTGRES_PASSWORD: ${{secrets.SPRING_DATASOURCE_PASSWORD}}
+        ports:
+          - 5432:5432
     steps:
     - uses: actions/checkout@v3
     
@@ -39,9 +23,15 @@ jobs:
       with:
         java-version: '17'
         distribution: 'temurin'
-        
+
     - name: Build application
+      env:
+        JWT_SECRET_KEY: ${{secrets.JWT_SECRET_KEY}}
+        SPRING_DATASOURCE_URL: ${{secrets.SPRING_DATASOURCE_URL}}
+        SPRING_DATASOURCE_USERNAME: ${{secrets.SPRING_DATASOURCE_USERNAME}}
+        SPRING_DATASOURCE_PASSWORD: ${{secrets.SPRING_DATASOURCE_PASSWORD}}
       run: |
         chmod +x ./gradlew
-        ./gradlew build
-    
+        ./gradlew clean
+        ./gradlew --info test
+

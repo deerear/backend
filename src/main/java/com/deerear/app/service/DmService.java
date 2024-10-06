@@ -1,10 +1,12 @@
 package com.deerear.app.service;
 
 import com.deerear.app.domain.Dm;
+import com.deerear.app.domain.DmChat;
 import com.deerear.app.domain.DmMember;
 import com.deerear.app.domain.Member;
 import com.deerear.app.dto.DmRequestDto;
 import com.deerear.app.dto.DmResponseDto;
+import com.deerear.app.repository.DmChatRepository;
 import com.deerear.app.repository.DmMemberRepository;
 import com.deerear.app.repository.DmRepository;
 import com.deerear.app.repository.MemberRepository;
@@ -15,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -25,6 +28,7 @@ public class DmService {
     private final SimpMessagingTemplate simpMessagingTemplate;
     private final DmRepository dmRepository;
     private final DmMemberRepository dmMemberRepository;
+    private final DmChatRepository dmChatRepository;
     private final MemberRepository memberRepository;
 
     public DmResponseDto createDm(CustomUserDetails customUserDetails, DmRequestDto request){
@@ -39,6 +43,15 @@ public class DmService {
         return DmResponseDto.builder()
                 .dmId(dm.getId())
                 .build();
+    }
+
+    public void listDmChats(CustomUserDetails customUserDetails, UUID dmId){
+
+        dmMemberRepository.existsByMemberIdAndDmId(customUserDetails.getUser().getId(), dmId);
+
+        List<DmChat> dmChats = dmChatRepository.findAllByDmId(dmId);
+
+
     }
 
     public void sendDm(CustomUserDetails member, UUID dmId, String text){

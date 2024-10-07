@@ -13,6 +13,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
@@ -22,7 +27,7 @@ public class SecurityConfig {
     private final CustomUserDetailsService customUserDetailsService;
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, CorsConfig corsConfig) throws Exception {
         return http
                 // REST API이므로 CSRF 보안 비활성화
                 .csrf(csrf -> csrf.disable())
@@ -45,6 +50,7 @@ public class SecurityConfig {
                         .requestMatchers("/**").permitAll()
                         .anyRequest().authenticated()
                 )
+                .addFilter(corsConfig.corsFilter())
                 // JWT 인증을 위하여 직접 구현한 필터를 UsernamePasswordAuthenticationFilter 전에 실행
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider, customUserDetailsService), UsernamePasswordAuthenticationFilter.class)
                 .build();

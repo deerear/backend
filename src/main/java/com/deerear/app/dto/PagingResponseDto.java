@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CommentsUpdateResponseDto {
-    private int id;
+public class PagingResponseDto {
+    private int size;
+    private String key;
+    private Boolean hasNext;
 }

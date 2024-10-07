@@ -1,6 +1,6 @@
 package com.deerear.jwt;
 
-import com.deerear.app.dto.JwtToken;
+import com.deerear.app.dto.MemberSignInResponseDto;
 import com.deerear.constant.ErrorCode;
 import com.deerear.exception.BizException;
 import io.jsonwebtoken.*;
@@ -41,7 +41,7 @@ public class JwtTokenProvider {
 
     // AccessToken과 RefreshToken을 생성하는 메서드
 
-    public JwtToken generateToken(Authentication authentication) {
+    public MemberSignInResponseDto generateToken(Authentication authentication) {
         long now = System.currentTimeMillis();
 
         // AccessToken 생성
@@ -56,7 +56,7 @@ public class JwtTokenProvider {
       //  log.debug("Generated AccessToken: {}", accessToken);
        // log.debug("Generated RefreshToken: {}", refreshToken);
 
-        return JwtToken.builder()
+        return MemberSignInResponseDto.builder()
                 .grantType("Bearer")
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)

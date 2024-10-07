@@ -1,10 +1,7 @@
 package com.deerear.app.service;
 
 import com.deerear.app.domain.Member;
-import com.deerear.app.dto.JwtToken;
-import com.deerear.app.dto.MemberDto;
-import com.deerear.app.dto.SignInDto;
-import com.deerear.app.dto.SignUpDto;
+import com.deerear.app.dto.*;
 import com.deerear.app.repository.MemberRepository;
 import com.deerear.constant.ErrorCode;
 import com.deerear.exception.BizException;
@@ -27,26 +24,26 @@ public class MemberService {
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
 
+
     @Transactional
-    public JwtToken signIn(String email, String password) {
-        // 1. 검증 단계
-        validateSignIn(email, password);
+    public MemberSignInResponseDto signIn(MemberSignInRequestDto memberSignInRequestDto) {
+        validateSignIn(memberSignInRequestDto.getEmail(), memberSignInRequestDto.getPassword());
 
-        // 2. 로직 단계
-        Member member = memberRepository.findByEmail(email)
-                .orElseThrow(() -> new BizException("해당하는 회원을 찾을 수 없습니다.", ErrorCode.USER_NOT_FOUND, "email: " + email));
+        Member member = memberRepository.findByEmail(memberSignInRequestDto.getEmail())
+                .orElseThrow(() -> new BizException("해당하는 회원을 찾을 수 없습니다.", ErrorCode.USER_NOT_FOUND, "email: " + memberSignInRequestDto.getEmail()));
 
-        boolean matches = passwordEncoder.matches(password, member.getPassword());
+        boolean matches = passwordEncoder.matches(memberSignInRequestDto.getPassword(), member.getPassword());
         if (!matches) {
-            throw new BizException("비밀번호가 잘못되었습니다.", ErrorCode.INVALID_PASSWORD, "email: " + email);
+            throw new BizException("비밀번호가 잘못되었습니다.", ErrorCode.INVALID_PASSWORD, "password: " + "");
         }
 
-        Authentication authentication = authenticateUser(email, password);
-        JwtToken jwtToken = jwtTokenProvider.generateToken(authentication);
+        Authentication authentication = authenticateUser(memberSignInRequestDto.getEmail(), memberSignInRequestDto.getPassword());
+        MemberSignInResponseDto memberSignInResponseDto = jwtTokenProvider.generateToken(authentication);
 
-        // 3. return
-        saveRefreshToken(member, jwtToken);
-        return jwtToken;
+        // 리프레시 토큰 저장
+        saveRefreshToken(member, memberSignInResponseDto);
+
+        return MemberSignInResponseDto.toDto(memberSignInResponseDto.getAccessToken(), memberSignInResponseDto.getRefreshToken());
     }
 
     private void validateSignIn(String email, String password) {
@@ -60,53 +57,57 @@ public class MemberService {
         return authenticationManagerBuilder.getObject().authenticate(authenticationToken);
     }
 
-    private void saveRefreshToken(Member member, JwtToken jwtToken) {
-        String refreshToken = jwtToken.getRefreshToken();
+    private void saveRefreshToken(Member member, MemberSignInResponseDto memberSignInResponseDto) {
+        String refreshToken = memberSignInResponseDto.getRefreshToken();
         member.setRefreshToken(refreshToken);
         memberRepository.save(member); // 데이터베이스에 리프레시 토큰 저장
     }
 
     @Transactional
-    public MemberDto signUp(SignUpDto signUpDto) {
+    public MemberSignUpResponseDto signUp(MemberSingUpRequestDto memberSingUpRequestDto) {
         // 1. 검증 단계
-        validateSignUp(signUpDto);
+        validateSignUp(memberSingUpRequestDto);
 
         // 2. 로직 단계
-        String encodedPassword = passwordEncoder.encode(signUpDto.getPassword());
+        String encodedPassword = passwordEncoder.encode(memberSingUpRequestDto.getPassword());
         //List<String> roles = new ArrayList<>();
         //roles.add("USER");
 
-        Member savedMember = memberRepository.save(signUpDto.toEntity(encodedPassword));
+        Member savedMember = memberRepository.save(memberSingUpRequestDto.toEntity(encodedPassword));
 
         // 3. return
-        return MemberDto.toDto(savedMember);
+        return MemberSignUpResponseDto.toDto(savedMember);
     }
 
-    private void validateSignUp(SignUpDto signUpDto) {
-        if (memberRepository.existsByEmail(signUpDto.getEmail())) {
-            throw new BizException("이미 사용 중인 사용자 이메일입니다.", ErrorCode.USERNAME_ALREADY_EXISTS, "email: " + signUpDto.getEmail());
+    private void validateSignUp(MemberSingUpRequestDto requestDto) {
+        if (memberRepository.existsByEmail(requestDto.getEmail())) {
+            throw new BizException("이미 사용 중인 사용자 이메일입니다.", ErrorCode.USERNAME_ALREADY_EXISTS, "email: " + requestDto.getEmail());
         }
     }
 
-    @Transactional
-    public JwtToken signIn(SignInDto signInDto) {
-        // 1. 검증 단계
-        validateSignIn(signInDto.getEmail(), signInDto.getPassword());
+    @Transactional(readOnly = true)
+    public MemberCheckNicknameResponseDto checkNickname(MemberCheckNicknameRequestDto memberCheckNicknameRequestDto) {
+        validateCheckNickname(memberCheckNicknameRequestDto);
+        return MemberCheckNicknameResponseDto.toDto(true);  // 사용 가능한 닉네임이면 true 반환
+    }
 
-        // 2. 로직 단계
-        Member member = memberRepository.findByEmail(signInDto.getEmail())
-                .orElseThrow(() -> new BizException("해당하는 회원을 찾을 수 없습니다.", ErrorCode.USER_NOT_FOUND, "email: " + signInDto.getEmail()));
-
-        boolean matches = passwordEncoder.matches(signInDto.getPassword(), member.getPassword());
-        if (!matches) {
-            throw new BizException("비밀번호가 잘못되었습니다.", ErrorCode.INVALID_PASSWORD, "password: " + "");
+    private void validateCheckNickname(MemberCheckNicknameRequestDto memberCheckNicknameRequestDto) {
+        //TODO 에러코드 추후 협의해봐야할듯
+        if (memberRepository.existsByNickname(memberCheckNicknameRequestDto.getNickname())) {
+            throw new BizException("이미 사용 중인 닉네임입니다.", ErrorCode.INVALID_INPUT, "닉네임: " + memberCheckNicknameRequestDto.getNickname());
         }
+    }
 
-        Authentication authentication = authenticateUser(signInDto.getEmail(), signInDto.getPassword());
-        JwtToken jwtToken = jwtTokenProvider.generateToken(authentication);
+    @Transactional(readOnly = true)
+    public MemberCheckEmailResponseDto checkEmail(MemberCheckEmailRequestDto requestDto) {
+        validateCheckEmail(requestDto);
+        return MemberCheckEmailResponseDto.toDto(true);  // 사용 가능한 닉네임이면 true 반환
+    }
 
-        // 3. return
-        return jwtToken;
+    private void validateCheckEmail(MemberCheckEmailRequestDto memberCheckEmailRequestDto) {
+        if (memberRepository.existsByEmail(memberCheckEmailRequestDto.getEmail())) {
+            throw new BizException("이미 사용 중인 사용자 이메일입니다.", ErrorCode.USERNAME_ALREADY_EXISTS, "email: " + memberCheckEmailRequestDto.getEmail());
+        }
     }
 
     @Transactional

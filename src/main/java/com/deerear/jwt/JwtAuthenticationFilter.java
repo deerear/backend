@@ -27,9 +27,11 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         String path = httpRequest.getRequestURI();
 
-        // 회원가입 요청인지 확인
-        if ("/api/members/sign-up".equals(path) || "/api/members/sign-in".equals(path)) {
-            // 회원가입 요청이므로 JWT 검증 생략
+        // 해당 API요청을 token 검증하지 않음.
+        if ("/api/members/sign-up".equals(path)
+                || "/api/members/sign-in".equals(path)
+                ||  "/api/members/check-nickname".equals(path)
+                ||  "/api/members/check-email".equals(path)) {
             chain.doFilter(request, response);
             return;
         }

@@ -1,18 +1,12 @@
 package com.deerear.app.controller;
 
-import com.deerear.app.dto.JwtToken;
-import com.deerear.app.dto.MemberDto;
-import com.deerear.app.dto.SignInDto;
-import com.deerear.app.dto.SignUpDto;
+import com.deerear.app.dto.*;
 import com.deerear.app.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
@@ -23,14 +17,28 @@ public class MemberController {
     private final MemberService memberService;
 
     @PostMapping("/sign-in")
-    public ResponseEntity<JwtToken> signIn(@RequestBody SignInDto signInDto) {
-        JwtToken jwtToken = memberService.signIn(signInDto.getEmail(), signInDto.getPassword());
-        return ResponseEntity.ok(jwtToken);
+    public ResponseEntity<MemberSignInResponseDto> signIn(@RequestBody MemberSignInRequestDto requestDto) {
+        MemberSignInResponseDto responseDto = memberService.signIn(requestDto);
+        return ResponseEntity.ok(responseDto);
     }
 
     @PostMapping("/sign-up")
-    public ResponseEntity<MemberDto> signUp(@RequestBody SignUpDto signUpDto) {
-        MemberDto savedMemberDto = memberService.signUp(signUpDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedMemberDto);
+    public ResponseEntity<MemberSignUpResponseDto> signUp(@RequestBody MemberSingUpRequestDto memberSingUpRequestDto) {
+        MemberSignUpResponseDto savedMemberSignUpResponseDto = memberService.signUp(memberSingUpRequestDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedMemberSignUpResponseDto);
+    }
+
+    @GetMapping("/check-nickname")
+    public ResponseEntity<MemberCheckNicknameResponseDto> checkNickname(@RequestParam String nickname) {
+        MemberCheckNicknameRequestDto requestDto = new MemberCheckNicknameRequestDto(nickname);
+        MemberCheckNicknameResponseDto responseDto = memberService.checkNickname(requestDto);
+        return ResponseEntity.ok(responseDto);
+    }
+
+    @GetMapping("/check-email")
+    public ResponseEntity<MemberCheckEmailResponseDto> checkEmail(@RequestParam String email) {
+        MemberCheckEmailRequestDto requestDto = new MemberCheckEmailRequestDto(email);
+        MemberCheckEmailResponseDto responseDto = memberService.checkEmail(requestDto);
+        return ResponseEntity.ok(responseDto);
     }
 }

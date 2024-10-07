@@ -5,14 +5,13 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CommentsCreateRequestDto {
+public class CommentListRequestDto extends PagingRequestDto {
 
     @NotBlank(message = "올바르지 않은 게시글ID 입니다 ${validatedValue}")
-    private String postId;
-
-    @NotBlank(message = "올바르지 않은 댓글 입니다. ${validatedValue}")
-    private String content;
+    private UUID postId;
 }

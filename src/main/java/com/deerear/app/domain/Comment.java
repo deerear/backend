@@ -37,4 +37,12 @@ public class Comment extends ModifiableEntity {
 
     @Column(nullable = false)
     private Boolean isDeleted;
+
+    public void isDeleted() {
+        isDeleted = true;
+    }
+
+    public void updateContent(String content) {
+        this.content = content;
+    }
 }

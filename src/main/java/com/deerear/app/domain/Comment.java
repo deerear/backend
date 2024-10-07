@@ -32,6 +32,9 @@ public class Comment extends ModifiableEntity {
     @Column(nullable = false)
     private String content;
 
-    @Column(name = "like_count", nullable = false)
+    @Column(nullable = false)
     private long likeCount;
+
+    @Column(nullable = false)
+    private Boolean isDeleted;
 }

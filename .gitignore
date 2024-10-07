@@ -71,4 +71,4 @@ out/
 # Ignore all Java files in the test directory
 
 # Except for the specific file you want to track
-src/test/java/com/deerear/app/DeerearApplicationTests.java
+src/test/java/com/deerear/app/DeerearApplicationTests.javasrc/main/resources/application.properties

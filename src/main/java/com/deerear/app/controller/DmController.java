@@ -1,6 +1,7 @@
 package com.deerear.app.controller;
 
 import com.deerear.app.dto.DmChatDto;
+import com.deerear.app.dto.DmDto;
 import com.deerear.app.dto.DmRequestDto;
 import com.deerear.app.dto.DmResponseDto;
 import com.deerear.app.service.CustomUserDetails;
@@ -34,9 +35,11 @@ public class DmController {
     }
 
     @MessageMapping("/{dmId}")
-    @SendTo("/{dmId}")
-    public DmChatDto sendDm(@AuthenticationPrincipal CustomUserDetails customUserDetails, @DestinationVariable UUID dmId, String message){
-        return dmService.sendDm(customUserDetails, dmId, message);
+    @SendTo("/sub/{dmId}")
+    public DmChatDto sendDm(@DestinationVariable UUID dmId, DmDto request){
+        DmChatDto output = dmService.sendDm(dmId, request);
+        System.out.println(output);
+        return output;
     }
 
 }

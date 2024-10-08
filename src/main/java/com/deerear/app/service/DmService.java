@@ -5,6 +5,7 @@ import com.deerear.app.domain.DmChat;
 import com.deerear.app.domain.DmMember;
 import com.deerear.app.domain.Member;
 import com.deerear.app.dto.DmChatDto;
+import com.deerear.app.dto.DmDto;
 import com.deerear.app.dto.DmRequestDto;
 import com.deerear.app.dto.DmResponseDto;
 import com.deerear.app.repository.DmChatRepository;
@@ -67,18 +68,19 @@ public class DmService {
     }
 
     @Transactional
-    public DmChatDto sendDm(CustomUserDetails customUserDetails, UUID dmId, String message){
+    public DmChatDto sendDm(UUID dmId, DmDto request){
 
-//        String email = jwtTokenProvider.getUsernameFromToken(auth.substring(7));
+        String token = request.getAuth().substring(7);
+        jwtTokenProvider.validateToken(token);
 
         Dm dm = dmRepository.getReferenceById(dmId);
-//        Member member = memberRepository.findByEmail(email).orElseThrow(() ->new BizException("존재하지 않는 유저입니다.", ErrorCode.NOT_FOUND, ""));
-        Member member = customUserDetails.getUser();
+        Member member = memberRepository.findByEmail(jwtTokenProvider.getUsernameFromToken(token)).orElseThrow(() ->new BizException("존재하지 않는 유저입니다.", ErrorCode.NOT_FOUND, ""));
 
-        DmChat chat = buildDmChat(dm, member, message);
+        DmChat chat = buildDmChat(dm, member, request.getMessage());
         dmChatRepository.save(chat);
 
-        dm.setLastMessage(message);
+        dm.setLastMessage(request.getMessage());
+        System.out.println(chat.toDto().toString());
         return chat.toDto();
     }
 

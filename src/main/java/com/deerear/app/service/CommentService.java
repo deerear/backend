@@ -3,13 +3,12 @@ package com.deerear.app.service;
 import com.deerear.app.domain.Comment;
 import com.deerear.app.domain.Member;
 import com.deerear.app.domain.Post;
-import com.deerear.app.dto.CommentListRequestDto;
 import com.deerear.app.dto.CommentListResponseDto;
 import com.deerear.app.dto.CommentSaveRequestDto;
+import com.deerear.app.dto.PagingRequestDto;
 import com.deerear.app.repository.CommentRepository;
 import com.deerear.app.repository.PostRepository;
 import com.deerear.exception.BizException;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -29,6 +28,8 @@ public class CommentService {
 
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
+
+    private final LikeService likeService;
 
     @Transactional
     public void createComment(Member member, CommentSaveRequestDto input) {
@@ -57,15 +58,15 @@ public class CommentService {
     }
 
     @Transactional(readOnly = true)
-    public List<CommentListResponseDto> listComment(CommentListResponseDto input) {
-        
-        int size = input.getSize();
+    public List<CommentListResponseDto> listComment(Member member, UUID postId, PagingRequestDto page) {
+
+        int size = page.getSize();
 
         Pageable pageable = PageRequest.of(0, size, Sort.by(Sort.Direction.DESC, "id"));
-        
-        // TODO 이 밑에서부터는 내일 회사에서 할게여ㅎ
 
-        // like 에서 isLikedBy(member) 만들고 시작해야 됨
+        // Boolean isLikedByMember = likeService.isLikedBy(member, comment)
+
+        // TODO @20241008 우지범: 1주일 소요 예정
 
         return new ArrayList<>();
     }

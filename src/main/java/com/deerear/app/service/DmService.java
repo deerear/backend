@@ -4,6 +4,8 @@ import com.deerear.app.domain.Dm;
 import com.deerear.app.domain.DmChat;
 import com.deerear.app.domain.DmMember;
 import com.deerear.app.domain.Member;
+import com.deerear.app.dto.DmChatDto;
+import com.deerear.app.dto.DmChatsResponseDto;
 import com.deerear.app.dto.DmRequestDto;
 import com.deerear.app.dto.DmResponseDto;
 import com.deerear.app.repository.DmChatRepository;
@@ -12,6 +14,7 @@ import com.deerear.app.repository.DmRepository;
 import com.deerear.app.repository.MemberRepository;
 import com.deerear.constant.ErrorCode;
 import com.deerear.exception.BizException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -54,10 +57,21 @@ public class DmService {
 
     }
 
-    public void sendDm(CustomUserDetails member, UUID dmId, String text){
+    @Transactional
+    public DmChatDto sendDm(CustomUserDetails customUserDetails, UUID dmId, String message){
+        Dm dm = dmRepository.getReferenceById(dmId);
 
-//        simpMessagingTemplate.convertAndSend("/sub/" + dmId, dm);
-        return;
+        DmChat chat = buildDmChat(dm, customUserDetails.getUser(), message);
+
+        return chat.toDto();
+    }
+
+    private DmChat buildDmChat(Dm dm, Member member, String message){
+        return DmChat.builder()
+                .dm(dm)
+                .member(member)
+                .message(message)
+                .build();
     }
 
     private DmMember buildDmMember(Dm dm, Member member) {

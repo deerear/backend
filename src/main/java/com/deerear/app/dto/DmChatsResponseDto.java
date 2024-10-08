@@ -17,17 +17,4 @@ public class DmChatsResponseDto {
     private String nextKey;
     private Integer size;
 
-    @Getter
-    @ToString
-    @AllArgsConstructor
-    @NoArgsConstructor
-    @Builder
-    public static class DmChatDto {
-
-        private String nickname;
-        private String profileImg;
-        private String message;
-        private Date createdAt;
-
-    }
 }

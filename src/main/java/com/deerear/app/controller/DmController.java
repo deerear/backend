@@ -1,5 +1,6 @@
 package com.deerear.app.controller;
 
+import com.deerear.app.dto.DmChatDto;
 import com.deerear.app.dto.DmRequestDto;
 import com.deerear.app.dto.DmResponseDto;
 import com.deerear.app.service.CustomUserDetails;
@@ -8,8 +9,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -32,9 +36,10 @@ public class DmController {
     }
 
 
-    @MessageMapping("/sub/{dmId}")
-    public void sendDm(@AuthenticationPrincipal CustomUserDetails member, UUID dmId, String text){
-        dmService.sendDm(member, dmId, text);
+    @MessageMapping("/pub/{dmId}")
+    @SendTo("/sub/{dmId}")
+    public DmChatDto sendDm(@AuthenticationPrincipal CustomUserDetails member, @DestinationVariable UUID dmId, String message){
+        return dmService.sendDm(member, dmId, message);
     }
 
 }

@@ -1,8 +1,6 @@
 package com.deerear.app.controller;
 
-import com.deerear.app.dto.CommentListRequestDto;
-import com.deerear.app.dto.CommentListResponseDto;
-import com.deerear.app.dto.CommentSaveRequestDto;
+import com.deerear.app.dto.*;
 import com.deerear.app.service.CommentService;
 import com.deerear.app.service.CustomUserDetails;
 import com.deerear.exception.BizException;
@@ -19,7 +17,7 @@ import java.util.UUID;
 
 import static com.deerear.constant.ErrorCode.NOT_NULL;
 
-@RequestMapping("/api/commnets")
+@RequestMapping("/api/comments")
 @RequiredArgsConstructor
 @RestController
 public class CommentController {
@@ -55,9 +53,11 @@ public class CommentController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    @GetMapping
-    public ResponseEntity<List<CommentListResponseDto>> listComment(@PathVariable CommentListResponseDto input) {
-        return ResponseEntity.ok(commentService.listComment(input));
+    @GetMapping("{postId}")
+    public ResponseEntity<List<CommentListResponseDto>> listComment(@AuthenticationPrincipal CustomUserDetails customUserDetails,
+                                                                    @PathVariable UUID postId,
+                                                                    @RequestBody PagingRequestDto page) {
+        return ResponseEntity.ok(commentService.listComment(customUserDetails.getUser(), postId, page));
     }
 }
 

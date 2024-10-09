@@ -1,9 +1,6 @@
 package com.deerear.app.service;
 
-import com.deerear.app.domain.Comment;
-import com.deerear.app.domain.Like;
-import com.deerear.app.domain.Member;
-import com.deerear.app.domain.Post;
+import com.deerear.app.domain.*;
 import com.deerear.app.repository.CommentRepository;
 import com.deerear.app.repository.LikeRepository;
 import com.deerear.app.repository.PostRepository;
@@ -24,38 +21,27 @@ public class LikeService {
 
     @Transactional
     public void likePost(Member member, UUID id) {
-        Post post = postRepository.getReferenceById(id);
-        likeOrUnlike(member, post);
+        likeOrUnlike(member, Likeable.TargetType.POST, id);
     }
 
     @Transactional
     public void likeComment(Member member, UUID id) {
-        Comment comment = commentRepository.getReferenceById(id);
-        likeOrUnlike(member, comment);
+        likeOrUnlike(member, Likeable.TargetType.COMMENT, id);
     }
 
-    @Transactional(readOnly = true)
-    public Boolean isLikedBy(Member member, Object entity) {
-        if (entity instanceof Post post) {
-            return likeRepository.existsByMemberAndPost(member, post);
-        } else if (entity instanceof Comment comment) {
-            return likeRepository.existsByMemberAndComment(member, comment);
-        } else {
-            return false;
-        }
-    }
-
-    private void likeOrUnlike(Member member, Object entity) {
-        if (entity instanceof Post post) {
-            likeRepository.findByMemberAndPost(member, post).ifPresentOrElse(
-                    likeRepository::delete,
-                    () -> likeRepository.save(Like.builder().member(member).post(post).build())
-            );
-        } else if (entity instanceof Comment comment) {
-            likeRepository.findByMemberAndComment(member, comment).ifPresentOrElse(
-                    likeRepository::delete,
-                    () -> likeRepository.save(Like.builder().member(member).comment(comment).build())
-            );
-        }
+    private void likeOrUnlike(Member member, Likeable.TargetType targetType, UUID targetId) {
+        likeRepository.findByMemberAndTargetTypeAndTargetId(member, targetType, targetId).ifPresentOrElse(
+                like -> {
+                    likeRepository.delete(like);
+                    like.loadTarget(postRepository, commentRepository);
+                    like.getTarget().decrementLikeCount();
+                },
+                () -> {
+                    Like like = Like.builder().member(member).targetType(targetType).targetId(targetId).build();
+                    likeRepository.save(like);
+                    like.loadTarget(postRepository, commentRepository);
+                    like.getTarget().incrementLikeCount();
+                }
+        );
     }
 }

@@ -13,7 +13,7 @@ import java.util.List;
 public class DmChatsResponseDto {
 
     private List<DmChatDto> objects;
-    private boolean hasNext;
+    private Boolean hasNext;
     private String nextKey;
     private Integer size;
 

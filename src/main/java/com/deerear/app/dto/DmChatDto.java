@@ -15,5 +15,4 @@ public class DmChatDto {
     private String profileImg;
     private String message;
     private Date createdAt;
-
 }

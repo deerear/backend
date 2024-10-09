@@ -1,9 +1,6 @@
 package com.deerear.app.controller;
 
-import com.deerear.app.dto.DmChatDto;
-import com.deerear.app.dto.DmDto;
-import com.deerear.app.dto.DmRequestDto;
-import com.deerear.app.dto.DmResponseDto;
+import com.deerear.app.dto.*;
 import com.deerear.app.service.CustomUserDetails;
 import com.deerear.app.service.DmService;
 import lombok.RequiredArgsConstructor;
@@ -30,8 +27,8 @@ public class DmController {
     }
 
     @GetMapping("/api/dm-chats/{dmId}")
-    public void getDmChats(@AuthenticationPrincipal CustomUserDetails member, @PathVariable UUID dmId, @RequestParam UUID nextKey, @RequestParam Long size) {
-        dmService.listDmChats(member, dmId, nextKey, size);
+    public ResponseEntity<DmChatsResponseDto> listDmChats(@AuthenticationPrincipal CustomUserDetails member, @PathVariable UUID dmId, @RequestParam UUID nextKey, @RequestParam Integer size) {
+        return ResponseEntity.ok(dmService.listDmChats(member, dmId, nextKey, size));
     }
 
     @MessageMapping("/{dmId}")

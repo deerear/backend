@@ -4,10 +4,7 @@ import com.deerear.app.domain.Dm;
 import com.deerear.app.domain.DmChat;
 import com.deerear.app.domain.DmMember;
 import com.deerear.app.domain.Member;
-import com.deerear.app.dto.DmChatDto;
-import com.deerear.app.dto.DmDto;
-import com.deerear.app.dto.DmRequestDto;
-import com.deerear.app.dto.DmResponseDto;
+import com.deerear.app.dto.*;
 import com.deerear.app.repository.DmChatRepository;
 import com.deerear.app.repository.DmMemberRepository;
 import com.deerear.app.repository.DmRepository;
@@ -17,10 +14,12 @@ import com.deerear.exception.BizException;
 import com.deerear.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -58,11 +57,37 @@ public class DmService {
     }
 
     @Transactional(readOnly = true)
-    public void listDmChats(CustomUserDetails customUserDetails, UUID dmId, UUID nextKey, Long size){
+    public DmChatsResponseDto listDmChats(CustomUserDetails customUserDetails, UUID dmId, UUID nextKey, Integer size){
 
         dmMemberRepository.existsByMemberIdAndDmId(customUserDetails.getUser().getId(), dmId);
 
-        List<DmChat> dmChats = dmChatRepository.findAllByDmId(dmId);
+        Dm dm = dmRepository.getReferenceById(dmId);
+        DmChat dmchat = dmChatRepository.findById(nextKey).orElseThrow(() ->new BizException("존재하지 않는 채팅입니다.", ErrorCode.NOT_FOUND, ""));
+
+        // TODO 첫 페이지
+        List<DmChat> dmChats = dmChatRepository.findNextPage(dmchat.getCreatedAt(), nextKey, dm, Pageable.ofSize(size+1));
+
+        String tempNextKey;
+        List<DmChatDto> dmChatsDto = new ArrayList<>();
+
+        if (dmChats.size() == 11){
+            for (int i=0;i<10;i++) {
+                dmChatsDto.add(dmChats.get(i).toDto());
+            }
+            tempNextKey = dmChats.get(9).getId().toString();
+        } else {
+            for (DmChat dmChat : dmChats) {
+                dmChatsDto.add(dmChat.toDto());
+            }
+            tempNextKey = dmChats.get(dmChats.size()-1).getId().toString();
+        }
+
+        return DmChatsResponseDto.builder()
+                .objects(dmChatsDto)
+                .hasNext(dmChats.size() > 10)
+                .nextKey(tempNextKey)
+                .size(size)
+                .build();
 
 
     }

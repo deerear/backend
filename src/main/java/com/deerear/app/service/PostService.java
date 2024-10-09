@@ -1,9 +1,6 @@
 package com.deerear.app.service;
 
-import com.deerear.app.domain.Like;
-import com.deerear.app.domain.Member;
-import com.deerear.app.domain.Post;
-import com.deerear.app.domain.PostImage;
+import com.deerear.app.domain.*;
 import com.deerear.app.dto.*;
 import com.deerear.app.repository.LikeRepository;
 import com.deerear.app.repository.MemberRepository;
@@ -45,7 +42,7 @@ public class PostService {
 
         Post post = validate(postRepository.findById(postId).orElseThrow(()-> new BizException("존재하지 않는 포스트 입니다.", ErrorCode.NOT_FOUND, "")));
         Member member = post.getMember();
-        Boolean isLike = likeRepository.existsByMemberAndPost(member, post);
+        Boolean isLike = likeRepository.existsByMemberAndTargetTypeAndTargetId(member, Likeable.TargetType.POST, postId);
         List<PostImage> postImages = postImageRepository.findAllByPostId(postId);
         List<String> imageUrls = postImages.stream().map(PostImage::getImageUrl).toList();
 

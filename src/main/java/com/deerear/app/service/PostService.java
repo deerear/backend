@@ -4,9 +4,7 @@ import com.deerear.app.domain.Like;
 import com.deerear.app.domain.Member;
 import com.deerear.app.domain.Post;
 import com.deerear.app.domain.PostImage;
-import com.deerear.app.dto.ListDto;
-import com.deerear.app.dto.PostRequestDto;
-import com.deerear.app.dto.PostResponseDto;
+import com.deerear.app.dto.*;
 import com.deerear.app.repository.LikeRepository;
 import com.deerear.app.repository.MemberRepository;
 import com.deerear.app.repository.PostImageRepository;
@@ -16,6 +14,8 @@ import com.deerear.exception.BizException;
 import com.deerear.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -25,6 +25,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static com.deerear.app.util.StaticFiles.saveImage;
 
@@ -51,6 +52,25 @@ public class PostService {
         return new PostResponseDto().toResponseDto(post, member, imageUrls, isLike);
     }
 
+//    @Transactional(readOnly = true)
+//    public List<MemberGetPostsResponseDto> getPosts(Member member, PagingRequestDto pagingRequestDto) {
+//        PageRequest pageRequest = PageRequest.of(0, pagingRequestDto.getSize());
+//        Page<Post> postPage = postRepository.findPostsByMember(member, pageRequest);
+//
+//        boolean hasNext = postPage.hasNext();  // 다음 페이지 여부 확인
+//        return postPage.getContent().stream()
+//                .map(post -> MemberGetPostsResponseDto.toDto(
+//                        post.getId(),
+//                        post.getTitle(),
+//                        post.getContent(),
+//                        post.getCreatedAt(),
+//                        pagingRequestDto.getSize(),
+//                        pagingRequestDto.getKey(),
+//                        hasNext
+//                ))
+//                .collect(Collectors.toList());
+//    }
+//
     @Transactional(readOnly = true)
     public ListDto listPosts(String nextKey, Integer size, BigDecimal startLatitude, BigDecimal startLongitude, BigDecimal endLatitude, BigDecimal endLongitude){
 

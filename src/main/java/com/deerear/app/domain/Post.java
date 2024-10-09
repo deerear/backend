@@ -51,4 +51,14 @@ public class Post extends Likeable {
     public TargetType getTargetType() {
         return TargetType.POST;
     }
+
+    public void incrementCommentCount() {
+        this.commentCount++;
+    }
+
+    public void decrementCommentCount() {
+        if (this.commentCount > 0) {
+            this.commentCount--;
+        }
+    }
 }

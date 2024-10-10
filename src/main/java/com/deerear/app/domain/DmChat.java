@@ -1,5 +1,6 @@
 package com.deerear.app.domain;
 
+import com.deerear.app.dto.DmChatDto;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -28,4 +29,13 @@ public class DmChat extends BaseEntity {
     private Member member;
 
     private String message;
+
+    public DmChatDto toDto(){
+        return DmChatDto.builder()
+                .nickname(member.getNickname())
+                .profileImg(member.getProfileImgUrl())
+                .message(message)
+                .createdAt(this.getCreatedAt())
+                .build();
+    }
 }

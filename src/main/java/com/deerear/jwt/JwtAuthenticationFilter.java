@@ -31,7 +31,9 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
         if ("/api/members/sign-up".equals(path)
                 || "/api/members/sign-in".equals(path)
                 ||  "/api/members/check-nickname".equals(path)
-                ||  "/api/members/check-email".equals(path)) {
+                ||  "/api/members/check-email".equals(path)
+                ||  "/websocket".equals(path)
+        ) {
             chain.doFilter(request, response);
             return;
         }

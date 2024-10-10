@@ -12,10 +12,10 @@ import java.util.List;
 import java.util.UUID;
 
 public interface DmChatRepository extends JpaRepository<DmChat, UUID> {
-    @Query("SELECT e FROM DmChat e WHERE e.createdAt > :lastTime And e.id != :lastId AND e.dm = :dm ORDER BY e.createdAt ASC")
+    @Query("SELECT e FROM DmChat e WHERE e.dm = :dm AND e.createdAt < :lastTime And e.id != :lastId ORDER BY e.createdAt DESC")
     List<DmChat> findNextPage(@Param("lastTime") Date lastTime, @Param("lastId") UUID lastId, @Param("dm") Dm dm, Pageable pageable);
 
-    @Query("SELECT e FROM DmChat e WHERE e.createdAt > :lastTime AND e.dm = :dm ORDER BY e.createdAt ASC")
-    List<DmChat> findFirstPage(@Param("lastTime") Date lastTime, @Param("dm") Dm dm, Pageable pageable);
+    @Query("SELECT e FROM DmChat e WHERE e.dm = :dm ORDER BY e.createdAt DESC")
+    List<DmChat> findByDmPage(@Param("dm") Dm dm, Pageable pageable);
 
 }

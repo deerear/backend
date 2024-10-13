@@ -8,21 +8,16 @@ import com.deerear.app.repository.PostImageRepository;
 import com.deerear.app.repository.PostRepository;
 import com.deerear.constant.ErrorCode;
 import com.deerear.exception.BizException;
-import com.deerear.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static com.deerear.app.util.StaticFiles.saveImage;
 
@@ -33,14 +28,13 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final PostImageRepository postImageRepository;
-    private final JwtTokenProvider jwtTokenProvider;
     private final MemberRepository memberRepository;
     private final LikeRepository likeRepository;
 
     @Transactional(readOnly = true)
     public PostResponseDto getPost(UUID postId) {
 
-        Post post = validate(postRepository.findById(postId).orElseThrow(()-> new BizException("존재하지 않는 포스트 입니다.", ErrorCode.NOT_FOUND, "")));
+        Post post = postRepository.findById(postId).orElseThrow(()-> new BizException("존재하지 않는 포스트 입니다.", ErrorCode.NOT_FOUND, ""));
         Member member = post.getMember();
         Boolean isLike = likeRepository.existsByMemberAndTargetTypeAndTargetId(member, Likeable.TargetType.POST, postId);
         List<PostImage> postImages = postImageRepository.findAllByPostId(postId);
@@ -69,19 +63,17 @@ public class PostService {
 //    }
 //
     @Transactional(readOnly = true)
-    public ListDto listPosts(String nextKey, Integer size, BigDecimal startLatitude, BigDecimal startLongitude, BigDecimal endLatitude, BigDecimal endLongitude){
+    public PostListResponseDto listPosts(String nextKey, Integer size, BigDecimal startLatitude, BigDecimal startLongitude, BigDecimal endLatitude, BigDecimal endLongitude){
 
-        return new ListDto();
+
+
+        return new PostListResponseDto();
     }
 
     @Transactional
-    public void createPost(String auth, PostRequestDto postRequestDto) {
+    public void createPost(CustomUserDetails customUserDetails, PostRequestDto postRequestDto) {
 
-        validate(postRequestDto);
-
-        String email = jwtTokenProvider.getUsernameFromToken(auth.substring(7));
-        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new BizException("존재하지 않는 유저 입니다.", ErrorCode.NOT_FOUND, ""));
-        Post post = postRepository.save(postRequestDto.toEntity(member));
+        Post post = postRepository.save(postRequestDto.toEntity(customUserDetails.getUser()));
 
         List<PostImage> postImages = new ArrayList<>();
 
@@ -95,13 +87,15 @@ public class PostService {
     }
 
     @Transactional
-    public void updatePost(String auth, UUID postId, PostRequestDto postRequestDto) {
+    public void updatePost(CustomUserDetails customUserDetails, UUID postId, PostRequestDto postRequestDto) {
 
-        validate(postRequestDto);
+        Member member = customUserDetails.getUser();
 
-        String email = jwtTokenProvider.getUsernameFromToken(auth.substring(7));
-        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new BizException("존재하지 않는 유저 입니다.", ErrorCode.NOT_FOUND, ""));
+        validate(member, postRequestDto.toEntity(member));
+
         Post post = postRepository.findById(postId).orElseThrow(()-> new BizException("존재하지 않는 포스트 입니다.", ErrorCode.NOT_FOUND, ""));
+
+        List<PostImage> postImgs = postImageRepository.findAllByPostId(postId);
 
         for(MultipartFile image: postRequestDto.getPostImgs()){
             String path = saveImage(image, "posts", post.getId().toString());
@@ -113,38 +107,21 @@ public class PostService {
     }
 
     @Transactional
-    public void deletePost(String auth, UUID postId) {
+    public void deletePost(CustomUserDetails customUserDetails, UUID postId) {
 
-        String email = jwtTokenProvider.getUsernameFromToken(auth.substring(7));
+        Member member = customUserDetails.getUser();
         Post post = postRepository.findById(postId).orElseThrow(()-> new BizException("존재하지 않는 포스트 입니다.", ErrorCode.NOT_FOUND, ""));
-        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new BizException("존재하지 않는 유저 입니다.", ErrorCode.NOT_FOUND, ""));
 
         validate(member, post);
 
         post.setIsDeleted(true);
     }
 
-    private void validate(PostRequestDto request) {
-        if (request.getTitle() == null){
-            throw new BizException("제목은 필수 입력 값입니다.", ErrorCode.INVALID_INPUT, "");
-        } else if (request.getContent() == null) {
-            throw new BizException("내용은 필수 입력 값입니다.", ErrorCode.INVALID_INPUT, "");
-        }
-    }
-
-    private Post validate(Post post){
-        if (post.getIsDeleted()){
-            throw new BizException("삭제된 포스트입니다.", ErrorCode.NOT_FOUND, "");
-        }
-        return post;
-    }
-
-    private Post validate(Member member, Post post){
+    private void validate(Member member, Post post){
         if (post.getIsDeleted()){
             throw new BizException("삭제된 포스트입니다.", ErrorCode.NOT_FOUND, "");
         } else if (!member.equals(post.getMember())){
             throw new BizException("게시글 생성자와 유저가 불일치합니다.", ErrorCode.INVALID_INPUT, "");
         };
-        return post;
     }
 }

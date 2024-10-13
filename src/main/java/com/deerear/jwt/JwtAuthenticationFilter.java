@@ -32,7 +32,7 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
                 || "/api/members/sign-in".equals(path)
                 ||  "/api/members/check-nickname".equals(path)
                 ||  "/api/members/check-email".equals(path)
-                ||  "/websocket".equals(path)
+                ||  path.startsWith("/app/images")
         ) {
             chain.doFilter(request, response);
             return;

@@ -2,6 +2,7 @@ package com.deerear.app.dto;
 
 import com.deerear.app.domain.Member;
 import com.deerear.app.domain.Post;
+import jakarta.validation.constraints.Digits;
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,7 +18,9 @@ public class PostRequestDto {
 
     private String title;
     private String content;
+    @Digits(integer = 10, fraction = 7)
     private BigDecimal latitude;
+    @Digits(integer = 10, fraction = 7)
     private BigDecimal longitude;
     private List<MultipartFile> postImgs;
 

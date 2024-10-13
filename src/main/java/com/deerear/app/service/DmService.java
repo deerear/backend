@@ -95,26 +95,15 @@ public class DmService {
     @Transactional
     public DmChatDto sendDm(UUID dmId, DmDto request){
 
-        String token = request.getAuth().substring(7);
-        jwtTokenProvider.validateToken(token);
-
         Dm dm = dmRepository.getReferenceById(dmId);
-        Member member = memberRepository.findByEmail(jwtTokenProvider.getUsernameFromToken(token)).orElseThrow(() ->new BizException("존재하지 않는 유저입니다.", ErrorCode.NOT_FOUND, ""));
-
-        DmChat chat = buildDmChat(dm, member, request.getMessage());
-        dmChatRepository.save(chat);
+        Member member = memberRepository.findByNickname(request.getNickname()).orElseThrow(() ->new BizException("존재하지 않는 유저입니다.", ErrorCode.NOT_FOUND, ""));
+        DmChat chat = dmChatRepository.save(DmChat.builder().dm(dm).member(member).message(request.getMessage()).build());
 
         dm.setLastMessage(request.getMessage());
+
         return chat.toDto();
     }
 
-    private DmChat buildDmChat(Dm dm, Member member, String message){
-        return DmChat.builder()
-                .dm(dm)
-                .member(member)
-                .message(message)
-                .build();
-    }
 
     private DmMember buildDmMember(Dm dm, Member member, Member chatMember) {
         return DmMember.builder()

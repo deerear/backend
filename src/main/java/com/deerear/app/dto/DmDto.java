@@ -11,7 +11,7 @@ import java.util.List;
 @Builder
 public class DmDto {
 
-    private String auth;
+    private String nickname;
     private String message;
 
 }

@@ -15,6 +15,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -40,7 +42,6 @@ public class MemberService {
         Authentication authentication = authenticateUser(memberSignInRequestDto.getEmail(), memberSignInRequestDto.getPassword());
         MemberSignInResponseDto memberSignInResponseDto = jwtTokenProvider.generateToken(authentication);
 
-        // 리프레시 토큰 저장
         saveRefreshToken(member, memberSignInResponseDto);
 
         return MemberSignInResponseDto.toDto(memberSignInResponseDto.getAccessToken(), memberSignInResponseDto.getRefreshToken());
@@ -65,17 +66,12 @@ public class MemberService {
 
     @Transactional
     public MemberSignUpResponseDto signUp(MemberSingUpRequestDto memberSingUpRequestDto) {
-        // 1. 검증 단계
         validateSignUp(memberSingUpRequestDto);
 
-        // 2. 로직 단계
         String encodedPassword = passwordEncoder.encode(memberSingUpRequestDto.getPassword());
-        //List<String> roles = new ArrayList<>();
-        //roles.add("USER");
 
         Member savedMember = memberRepository.save(memberSingUpRequestDto.toEntity(encodedPassword));
 
-        // 3. return
         return MemberSignUpResponseDto.toDto(savedMember);
     }
 
@@ -88,6 +84,7 @@ public class MemberService {
     @Transactional(readOnly = true)
     public MemberCheckNicknameResponseDto checkNickname(MemberCheckNicknameRequestDto memberCheckNicknameRequestDto) {
         validateCheckNickname(memberCheckNicknameRequestDto);
+
         return MemberCheckNicknameResponseDto.toDto(true);  // 사용 가능한 닉네임이면 true 반환
     }
 
@@ -101,6 +98,7 @@ public class MemberService {
     @Transactional(readOnly = true)
     public MemberCheckEmailResponseDto checkEmail(MemberCheckEmailRequestDto requestDto) {
         validateCheckEmail(requestDto);
+
         return MemberCheckEmailResponseDto.toDto(true);  // 사용 가능한 닉네임이면 true 반환
     }
 
@@ -112,15 +110,15 @@ public class MemberService {
 
     @Transactional
     public void changePassword(String email, String newPassword) {
-        // 1. 검증 단계
         validateChangePassword(email, newPassword);
 
-        // 2. 로직 단계
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new BizException("해당하는 회원을 찾을 수 없습니다.", ErrorCode.USER_NOT_FOUND, "email: " + email));
 
         String encodedPassword = passwordEncoder.encode(newPassword);
+
         member.setPassword(encodedPassword);
+
         memberRepository.save(member);
     }
 
@@ -128,5 +126,13 @@ public class MemberService {
         if (email == null || newPassword == null) {
             throw new BizException("사용자 이름 또는 새 비밀번호가 누락되었습니다.", ErrorCode.INVALID_INPUT, "email: " + email);
         }
+    }
+
+    @Transactional
+    public MemberGetProfileResponseDto getProfile(Member requestMember) {
+        String email = requestMember.getEmail();
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(() -> new BizException("해당하는 회원을 찾을 수 없습니다.", ErrorCode.USER_NOT_FOUND, "email: " + email));
+        return MemberGetProfileResponseDto.toDto(member.getNickname(),member.getEmail(),member.getProfileImgUrl());
     }
 }

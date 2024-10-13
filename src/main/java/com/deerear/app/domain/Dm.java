@@ -1,5 +1,6 @@
 package com.deerear.app.domain;
 
+import com.deerear.app.dto.DmResponseDto;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -23,4 +24,9 @@ public class Dm extends BaseEntity {
 
     private String lastMessage;
 
+    public DmResponseDto toDto() {
+        return DmResponseDto.builder()
+                .dmId(id)
+                .build();
+    }
 }

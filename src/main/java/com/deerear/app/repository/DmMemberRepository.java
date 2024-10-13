@@ -8,4 +8,6 @@ import java.util.UUID;
 
 public interface DmMemberRepository extends JpaRepository<DmMember, UUID> {
     boolean existsByMemberIdAndDmId(UUID memberId, UUID dmId);
+
+    Optional<DmMember> findByMemberIdAndChatMemberId(UUID memberId, UUID chatMemberId);
 }

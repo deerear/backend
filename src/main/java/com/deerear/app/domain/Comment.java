@@ -15,7 +15,7 @@ import java.util.UUID;
 @EqualsAndHashCode(of = "id", callSuper = false)
 @ToString
 @Table(name = "comments")
-public class Comment extends ModifiableEntity {
+public class Comment extends Likeable {
 
     @Id
     @GeneratedValue(generator = "UUID")
@@ -32,6 +32,20 @@ public class Comment extends ModifiableEntity {
     @Column(nullable = false)
     private String content;
 
-    @Column(name = "like_count", nullable = false)
-    private long likeCount;
+    @Column(nullable = false)
+    private Boolean isDeleted;
+
+    public void isDeleted() {
+        isDeleted = true;
+    }
+
+    public void updateContent(String content) {
+        this.content = content;
+    }
+
+    @Override
+    @Enumerated(EnumType.STRING)
+    public TargetType getTargetType() {
+        return TargetType.COMMENT;
+    }
 }

@@ -2,10 +2,8 @@ package com.deerear.app.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.GenericGenerator;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -17,7 +15,7 @@ import java.util.UUID;
 @EqualsAndHashCode(of = "id", callSuper = false)
 @ToString
 @Table(name = "posts")
-public class Post extends ModifiableEntity {
+public class Post extends Likeable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -45,9 +43,22 @@ public class Post extends ModifiableEntity {
     @Column(name = "comment_count", nullable = false)
     private long commentCount;
 
-    @Column(name = "like_count", nullable = false)
-    private long likeCount;
-
     @Column(nullable = false)
     private Boolean isDeleted;
+
+    @Override
+    @Enumerated(EnumType.STRING)
+    public TargetType getTargetType() {
+        return TargetType.POST;
+    }
+
+    public void incrementCommentCount() {
+        this.commentCount++;
+    }
+
+    public void decrementCommentCount() {
+        if (this.commentCount > 0) {
+            this.commentCount--;
+        }
+    }
 }

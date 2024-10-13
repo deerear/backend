@@ -28,4 +28,7 @@ public class DmMember extends BaseEntity {
     private Member member;
 
     private boolean isRead;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Member chatMember;
 }

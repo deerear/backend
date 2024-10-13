@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.*;
-import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,7 +26,7 @@ public class DmController {
     }
 
     @GetMapping("/api/dm-chats/{dmId}")
-    public ResponseEntity<DmChatsResponseDto> listDmChats(@AuthenticationPrincipal CustomUserDetails member, @PathVariable UUID dmId, @RequestParam UUID nextKey, @RequestParam Integer size) {
+    public ResponseEntity<DmChatsResponseDto> listDmChats(@AuthenticationPrincipal CustomUserDetails member, @PathVariable UUID dmId, @RequestParam String nextKey, @RequestParam Integer size) {
         return ResponseEntity.ok(dmService.listDmChats(member, dmId, nextKey, size));
     }
 

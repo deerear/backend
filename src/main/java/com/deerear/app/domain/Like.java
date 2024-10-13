@@ -1,8 +1,9 @@
 package com.deerear.app.domain;
 
+import com.deerear.app.repository.CommentRepository;
+import com.deerear.app.repository.PostRepository;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.GenericGenerator;
 
 import java.util.UUID;
 
@@ -12,22 +13,34 @@ import java.util.UUID;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-@Data
 @EqualsAndHashCode(of = "id", callSuper = false)
 @Table(name = "likes")
 public class Like extends BaseEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(updatable = false, nullable = false, unique = true)
+    @GeneratedValue
     private UUID id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
+    @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Post post;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "target_type", nullable = false)
+    private Likeable.TargetType targetType;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    Comment comment;
+    @Column(name = "target_id", nullable = false)
+    private UUID targetId;
+
+    @Transient
+    private Likeable target;
+
+    public void loadTarget(PostRepository postRepository, CommentRepository commentRepository) {
+        if (targetType == Likeable.TargetType.POST) {
+            this.target = postRepository.getReferenceById(targetId);
+        } else if (targetType == Likeable.TargetType.COMMENT) {
+            this.target = commentRepository.getReferenceById(targetId);
+        }
+        // TODO repository를 여기서 DI하면 안되는교,,, @20241009 우지범
+    }
 }

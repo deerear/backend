@@ -63,7 +63,7 @@ public class PostService {
 //    }
 //
     @Transactional(readOnly = true)
-    public PostListResponseDto listPosts(String nextKey, Integer size, BigDecimal startLatitude, BigDecimal startLongitude, BigDecimal endLatitude, BigDecimal endLongitude){
+    public PostListResponseDto listPosts(PostListRequestDto request){
 
 
 

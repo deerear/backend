@@ -1,5 +1,6 @@
 package com.deerear.app.controller;
 
+import com.deerear.app.dto.PostListRequestDto;
 import com.deerear.app.dto.PostListResponseDto;
 import com.deerear.app.dto.PostRequestDto;
 import com.deerear.app.dto.PostResponseDto;
@@ -25,14 +26,8 @@ public class PostController {
     private final PostService postService;
 
     @GetMapping("")
-    public ResponseEntity<PostListResponseDto> listPosts(
-            @RequestParam String nextKey,
-            @RequestParam Integer size,
-            @RequestParam BigDecimal startLatitude,
-            @RequestParam BigDecimal startLongitude,
-            @RequestParam BigDecimal endLatitude,
-            @RequestParam BigDecimal endLongitude) {
-        return ResponseEntity.ok(postService.listPosts(nextKey, size, startLatitude, startLongitude, endLatitude, endLongitude));
+    public ResponseEntity<PostListResponseDto> listPosts(PostListRequestDto request) {
+        return ResponseEntity.ok(postService.listPosts(request));
     }
     @GetMapping("/{postId}")
     public ResponseEntity<PostResponseDto> getPost(@PathVariable UUID postId) {

@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class BizExceptionHandler {
 
     @ExceptionHandler(BizException.class)
-    public ResponseEntity<ErrorResponse> handleDearException(BizException e) {
+    public ResponseEntity<ErrorResponse> handleBizException(BizException e) {
         ErrorResponse errorResponse = new ErrorResponse(
                 e.getMessage(),
                 e.getErrorCodeEnum().getCode(),

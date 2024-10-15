@@ -10,6 +10,7 @@ import com.deerear.constant.ErrorCode;
 import com.deerear.exception.BizException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -43,31 +44,33 @@ public class PostService {
         return new PostResponseDto().toResponseDto(post, member, imageUrls, isLike);
     }
 
-//    @Transactional(readOnly = true)
-//    public List<MemberGetPostsResponseDto> getPosts(Member member, PagingRequestDto pagingRequestDto) {
-//        PageRequest pageRequest = PageRequest.of(0, pagingRequestDto.getSize());
-//        Page<Post> postPage = postRepository.findPostsByMember(member, pageRequest);
-//
-//        boolean hasNext = postPage.hasNext();  // 다음 페이지 여부 확인
-//        return postPage.getContent().stream()
-//                .map(post -> MemberGetPostsResponseDto.toDto(
-//                        post.getId(),
-//                        post.getTitle(),
-//                        post.getContent(),
-//                        post.getCreatedAt(),
-//                        pagingRequestDto.getSize(),
-//                        pagingRequestDto.getKey(),
-//                        hasNext
-//                ))
-//                .collect(Collectors.toList());
-//    }
-//
     @Transactional(readOnly = true)
     public PostListResponseDto listPosts(PostListRequestDto request){
 
+        List<Post> posts;
 
+        if(request.getKey() == null){
+            posts = postRepository.findNextPage(request.getStartLatitude(), request.getStartLongitude(), request.getEndLatitude(), request.getEndLongitude(), Pageable.ofSize(request.getSize()+1));
+        } else {
+            Post post = postRepository.getReferenceById(UUID.fromString(request.getKey()));
+            posts = postRepository.findNextPage(post.getCreatedAt(), post.getId() , request.getStartLatitude(), request.getStartLongitude(), request.getEndLatitude(), request.getEndLongitude(), Pageable.ofSize(request.getSize()+1));
+        }
 
-        return new PostListResponseDto();
+        String nextKey;
+        boolean hasNext = false;
+
+        if (posts.size() == 11){
+            posts = posts.subList(0,10);
+            hasNext = true;
+        }
+
+        nextKey = posts.get(posts.size()-1).getId().toString();
+
+        return PostListResponseDto.builder()
+                .objects(posts)
+                .hasNext(hasNext)
+                .nextKey(nextKey)
+                .build();
     }
 
     @Transactional

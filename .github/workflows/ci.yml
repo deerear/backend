@@ -20,7 +20,7 @@ jobs:
 
     - name: Create local.properties
       run: |
-        echo "SPRING_DATASOURCE_URL=${{ secrets.SPRING_DATASOURCE_URL }}" >> local.properties
+        echo "SPRING_DATASOURCE_URL=${{ secrets.DB_NAME }}" >> local.properties
         echo "SPRING_DATASOURCE_USERNAME=${{ secrets.SPRING_DATASOURCE_USERNAME }}" >> local.properties
         echo "SPRING_DATASOURCE_PASSWORD=${{ secrets.SPRING_DATASOURCE_PASSWORD }}" >> local.properties
         SPRING_JPA_HIBERNATE_DDL-AUTO=create
@@ -37,9 +37,8 @@ jobs:
         SPRING_DATASOURCE_URL: ${{secrets.SPRING_DATASOURCE_URL}}
         SPRING_DATASOURCE_USERNAME: ${{secrets.SPRING_DATASOURCE_USERNAME}}
         SPRING_DATASOURCE_PASSWORD: ${{secrets.SPRING_DATASOURCE_PASSWORD}}
-        SPRING_JPA_HIBERNATE_DDL-AUTO: create
       run: |
         chmod +x ./gradlew
         ./gradlew clean
-        ./gradlew --info test
+        ./gradlew --info build
 

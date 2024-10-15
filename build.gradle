@@ -108,7 +108,7 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 def localProperties = new Properties()
-def localFile = rootProject.file('local.properties')
+def localFile = rootProject.file('.env')
 if (localFile.exists()) {
 	localFile.withInputStream { localProperties.load(it) }
 }

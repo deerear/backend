@@ -24,6 +24,12 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
+    - name: Create local.properties
+      run: |
+        echo "SPRING_DATASOURCE_URL=${{ secrets.SPRING_DATASOURCE_URL }}" >> local.properties
+        echo "SPRING_DATASOURCE_USERNAME=${{ secrets.SPRING_DATASOURCE_USERNAME }}" >> local.properties
+        echo "SPRING_DATASOURCE_PASSWORD=${{ secrets.SPRING_DATASOURCE_PASSWORD }}" >> local.properties
+
     - name: Build application
       env:
         JWT_SECRET_KEY: ${{secrets.JWT_SECRET_KEY}}

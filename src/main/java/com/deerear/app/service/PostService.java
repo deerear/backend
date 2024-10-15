@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static com.deerear.app.util.StaticFiles.saveImage;
@@ -38,38 +39,53 @@ public class PostService {
         Post post = postRepository.findById(postId).orElseThrow(()-> new BizException("존재하지 않는 포스트 입니다.", ErrorCode.NOT_FOUND, ""));
         Member member = post.getMember();
         Boolean isLike = likeRepository.existsByMemberAndTargetTypeAndTargetId(member, Likeable.TargetType.POST, postId);
-        List<PostImage> postImages = postImageRepository.findAllByPostId(postId);
-        List<String> imageUrls = postImages.stream().map(PostImage::getImageUrl).toList();
+        List<PostImage> postImgs = postImageRepository.findAllByPostId(postId);
+        List<String> imageUrls = postImgs.stream().map(PostImage::getImageUrl).toList();
 
-        return new PostResponseDto().toResponseDto(post, member, imageUrls, isLike);
+        return post.toDto(member, imageUrls, isLike);
     }
 
     @Transactional(readOnly = true)
-    public PostListResponseDto listPosts(PostListRequestDto request){
+    public PostListResponseDto listPosts(CustomUserDetails customUserDetails, PostListRequestDto request, Optional<String> nextKey, Integer size){
+
+        Member member = customUserDetails.getUser();
 
         List<Post> posts;
 
-        if(request.getKey() == null){
-            posts = postRepository.findNextPage(request.getStartLatitude(), request.getStartLongitude(), request.getEndLatitude(), request.getEndLongitude(), Pageable.ofSize(request.getSize()+1));
+        if(nextKey.isEmpty()){
+            System.out.println("키 널 조회");
+            System.out.println("start lati :" + request.getStartLatitude());
+            System.out.println("start long :" + request.getStartLongitude());
+            System.out.println("end lati :" + request.getEndLatitude());
+            System.out.println("end long :" + request.getEndLongitude());
+            posts = postRepository.findNextPage(request.getStartLatitude(), request.getStartLongitude(), request.getEndLatitude(), request.getEndLongitude(), Pageable.ofSize(size+1));
         } else {
-            Post post = postRepository.getReferenceById(UUID.fromString(request.getKey()));
-            posts = postRepository.findNextPage(post.getCreatedAt(), post.getId() , request.getStartLatitude(), request.getStartLongitude(), request.getEndLatitude(), request.getEndLongitude(), Pageable.ofSize(request.getSize()+1));
+            System.out.println("키 조회");
+            Post post = postRepository.getReferenceById(UUID.fromString(nextKey.orElseThrow()));
+            posts = postRepository.findNextPage(post.getCreatedAt(), post.getId() , request.getStartLatitude(), request.getStartLongitude(), request.getEndLatitude(), request.getEndLongitude(), Pageable.ofSize(size+1));
         }
 
-        String nextKey;
+        String key = "";
         boolean hasNext = false;
 
         if (posts.size() == 11){
             posts = posts.subList(0,10);
             hasNext = true;
+            key = posts.get(posts.size()-1).getId().toString();
         }
 
-        nextKey = posts.get(posts.size()-1).getId().toString();
+        List<PostDto> postDtos = new ArrayList<>();
+        for(Post post : posts){
+            Boolean isLike = likeRepository.existsByMemberAndTargetTypeAndTargetId(member, Likeable.TargetType.POST, post.getId());
+            postDtos.add(post.toDto(isLike));
+        }
+
 
         return PostListResponseDto.builder()
-                .objects(posts)
+                .objects(postDtos)
                 .hasNext(hasNext)
-                .nextKey(nextKey)
+                .nextKey(key)
+                .size(postDtos.size())
                 .build();
     }
 

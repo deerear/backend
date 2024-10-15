@@ -16,9 +16,9 @@ import java.util.UUID;
 
 @Repository
 public interface PostRepository extends JpaRepository<Post, UUID> {
-    @Query("SELECT e FROM Post e WHERE e.createdAt < :createdAt And e.id != :nextKey AND e.latitude >= :startLatitude AND e.longitude >= :startLongitude AND e.latitude <= :endLatitude AND e.longitude <= :endLongitude ORDER BY e.createdAt DESC")
+    @Query("SELECT e FROM Post e WHERE e.createdAt < :createdAt And e.id != :nextKey AND e.latitude >= :startLatitude AND e.longitude >= :startLongitude AND e.latitude <= :endLatitude AND e.longitude <= :endLongitude AND e.isDeleted = false ORDER BY e.createdAt DESC")
     List<Post> findNextPage(@Param("createdAt") Date createdAt, @Param("nextKey") UUID nextKey, @Param("startLatitude") BigDecimal startLatitude, @Param("startLongitude") BigDecimal startLongitude,@Param("endLatitude") BigDecimal endLatitude, @Param("endLongitude") BigDecimal endLongitude, Pageable pageable);
 
-    @Query("SELECT e FROM Post e WHERE  e.latitude >= :startLatitude AND e.longitude >= :startLongitude AND e.latitude <= :endLatitude AND e.longitude <= :endLongitude ORDER BY e.createdAt DESC")
+    @Query("SELECT e FROM Post e WHERE  e.latitude >= :startLatitude AND e.longitude >= :startLongitude AND e.latitude <= :endLatitude AND e.longitude <= :endLongitude AND e.isDeleted = false ORDER BY e.createdAt DESC")
     List<Post> findNextPage(@Param("startLatitude") BigDecimal startLatitude, @Param("startLongitude") BigDecimal startLongitude,@Param("endLatitude") BigDecimal endLatitude, @Param("endLongitude") BigDecimal endLongitude, Pageable pageable);
 }

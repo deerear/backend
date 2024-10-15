@@ -30,20 +30,4 @@ public class PostResponseDto {
     private Boolean isLike;
     private Date createdAt;
 
-    public PostResponseDto toResponseDto(Post post, Member member, List<String> imageUrls, Boolean isLike){
-        return PostResponseDto.builder()
-                .postId(post.getId())
-                .nickname(member.getNickname())
-                .profileImg(member.getProfileImgUrl())
-                .title(post.getTitle())
-                .content(post.getContent())
-                .postImgs(imageUrls)
-                .latitude(post.getLatitude())
-                .longitude(post.getLongitude())
-                .commentCount(post.getCommentCount())
-                .likeCount(post.getLikeCount())
-                .createdAt(post.getCreatedAt())
-                .isLike(isLike)
-                .build();
-    }
 }

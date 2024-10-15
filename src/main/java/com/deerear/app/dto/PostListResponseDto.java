@@ -11,8 +11,9 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 public class PostListResponseDto {
-    private List<Post> objects;
+    private List<PostDto> objects;
     private Boolean hasNext;
     private String nextKey;
     private Integer size;
+
 }

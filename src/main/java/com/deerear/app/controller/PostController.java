@@ -15,6 +15,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -26,8 +27,8 @@ public class PostController {
     private final PostService postService;
 
     @GetMapping("")
-    public ResponseEntity<PostListResponseDto> listPosts(PostListRequestDto request) {
-        return ResponseEntity.ok(postService.listPosts(request));
+    public ResponseEntity<PostListResponseDto> listPosts(@AuthenticationPrincipal CustomUserDetails customUserDetails, PostListRequestDto request, @RequestParam Optional<String> nextKey, @RequestParam Integer size) {
+        return ResponseEntity.ok(postService.listPosts(customUserDetails, request, nextKey, size));
     }
     @GetMapping("/{postId}")
     public ResponseEntity<PostResponseDto> getPost(@PathVariable UUID postId) {

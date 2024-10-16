@@ -15,7 +15,8 @@ import java.util.UUID;
 public class StaticFiles {
     public static String saveImage(MultipartFile file, String route, String id) {
 
-        String name = file.getName();
+        String name = file.getOriginalFilename();
+        assert name != null;
         String extension = name.substring(name.lastIndexOf(".") + 1);
 
         String fileName = UUID.randomUUID().toString().replace("-", "") + "." + extension;

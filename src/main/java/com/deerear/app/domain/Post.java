@@ -1,9 +1,13 @@
 package com.deerear.app.domain;
 
+import com.deerear.app.dto.PostDto;
+import com.deerear.app.dto.PostDetailResponseDto;
+import com.deerear.app.dto.PostImageDto;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -60,5 +64,37 @@ public class Post extends Likeable {
         if (this.commentCount > 0) {
             this.commentCount--;
         }
+    }
+
+    public PostDetailResponseDto toDto(Member member, List<PostImageDto> postImageListDto, Boolean isLike){
+        return PostDetailResponseDto.builder()
+                .postId(id)
+                .nickname(member.getNickname())
+                .profileImg(member.getProfileImgUrl())
+                .title(title)
+                .content(content)
+                .postImgs(postImageListDto)
+                .latitude(latitude)
+                .longitude(longitude)
+                .commentCount(commentCount)
+                .likeCount(this.getLikeCount())
+                .createdAt(this.getCreatedAt())
+                .isLike(isLike)
+                .build();
+    }
+
+    public PostDto toDto(Boolean isLike){
+        return PostDto.builder()
+                .id(id)
+                .title(title)
+                .content(content)
+                .thumbnail(thumbnail)
+                .commentCount(commentCount)
+                .likesCount(this.getLikeCount())
+                .isLike(isLike)
+                .latitude(latitude)
+                .longitude(longitude)
+                .createdAt(this.getCreatedAt())
+                .build();
     }
 }

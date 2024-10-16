@@ -16,10 +16,10 @@ public class StaticFiles {
     public static String saveImage(MultipartFile file, String route, String id) {
 
         String fileName = UUID.randomUUID().toString().replace("-", "");
-        String dbPath = "/app/images/" + route + "/" + id + "/" + fileName;
+        String dbPath = "/images/" + route + "/" + id + "/" + fileName;
 
         // Path 객체 생성
-        Path path = Paths.get("." + dbPath);
+        Path path = Paths.get("./app" + dbPath);
 
         try{
             if (!Files.exists(path.getParent())) {

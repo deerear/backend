@@ -16,8 +16,15 @@ jobs:
         ports:
           - 5432:5432
     steps:
-    - name: init DB
-      run: docker exec -it postgres psql -d ${{secrets.DB_NAME}} < ${{secrets.DB_SQL}}
+
+    - name : Install psql
+      run: |
+        apt-get update
+        apt-get install --yes --no-install-recommends postgresql-client
+
+    - name: Init DB
+      run: |
+        psql -h postgres -d ${{secrets.DB_NAME}} -c ${{secrets.DB_SQL}}
 
     - uses: actions/checkout@v4
 

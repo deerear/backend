@@ -87,15 +87,16 @@ public class PostService {
 
         Post post = postRepository.save(postCreateRequestDto.toEntity(customUserDetails.getUser()));
 
-        List<PostImage> postImages = new ArrayList<>();
-
-        for(MultipartFile image: postCreateRequestDto.getPostImgs()){
-            String path = saveImage(image, "posts", post.getId().toString());
-            PostImage postImage = PostImage.builder().post(post).imageUrl(path).build();
-            postImages.add(postImage);
+        if (postCreateRequestDto.getPostImgs() != null) {
+            List<PostImage> postImages = new ArrayList<>();
+            for(MultipartFile image: postCreateRequestDto.getPostImgs()){
+                String path = saveImage(image, "posts", post.getId().toString());
+                PostImage postImage = PostImage.builder().post(post).imageUrl(path).build();
+                postImages.add(postImage);
+            }
+            postImageRepository.saveAll(postImages);
         }
 
-        postImageRepository.saveAll(postImages);
     }
 
     @Transactional
@@ -107,13 +108,12 @@ public class PostService {
 
         Post post = postRepository.findById(postId).orElseThrow(()-> new BizException("존재하지 않는 포스트 입니다.", ErrorCode.NOT_FOUND, ""));
 
-        List<PostImage> postImgs = postImageRepository.findAllByPostId(postId);
-        List<String> imageUrls = postImgs.stream().map(PostImage::getImageUrl).toList();
-
-        for(MultipartFile image: postUpdateRequestDto.getPostImgs()){
-            String path = saveImage(image, "posts", post.getId().toString());
-            PostImage postImage = PostImage.builder().post(post).imageUrl(path).build();
-            postImageRepository.save(postImage);
+        if (postUpdateRequestDto.getPostImgs() != null){
+            for(MultipartFile image: postUpdateRequestDto.getPostImgs()){
+                String path = saveImage(image, "posts", post.getId().toString());
+                PostImage postImage = PostImage.builder().post(post).imageUrl(path).build();
+                postImageRepository.save(postImage);
+            }
         }
 
         post.setTitle(postUpdateRequestDto.getTitle());
@@ -127,10 +127,19 @@ public class PostService {
 
         Member member = customUserDetails.getUser();
         Post post = postRepository.findById(postId).orElseThrow(()-> new BizException("존재하지 않는 포스트 입니다.", ErrorCode.NOT_FOUND, ""));
-
         validate(member, post);
 
         post.setIsDeleted(true);
+    }
+
+    @Transactional
+    public void deleteImage(CustomUserDetails customUserDetails, UUID imageId) {
+
+        Member member = customUserDetails.getUser();
+        PostImage postImage = postImageRepository.getReferenceById(imageId);
+        validate(member, postImage.getPost());
+
+        postImageRepository.delete(postImage);
     }
 
     private void validate(Member member, Post post){

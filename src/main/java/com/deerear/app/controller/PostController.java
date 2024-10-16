@@ -48,4 +48,10 @@ public class PostController {
         postService.deletePost(customUserDetails, postId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
     }
+
+    @DeleteMapping("/images/{imageId}")
+    public ResponseEntity<Object> deleteImage(@AuthenticationPrincipal CustomUserDetails customUserDetails, @PathVariable UUID imageId){
+        postService.deleteImage(customUserDetails, imageId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+    }
 }

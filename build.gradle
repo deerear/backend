@@ -3,6 +3,7 @@ plugins {
 	id 'org.springframework.boot' version '3.3.2'
 	id 'io.spring.dependency-management' version '1.1.6'
 	id "org.asciidoctor.jvm.convert" version "3.3.2"
+	id 'nu.studer.jooq' version '8.2'
 }
 
 group = 'com.deerear'
@@ -61,6 +62,12 @@ dependencies {
 
 	// Validation
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+	// Jooq
+	implementation 'org.jooq:jooq:3.16.9'
+	implementation 'org.springframework.boot:spring-boot-starter-jooq'
+	jooqGenerator 'org.postgresql:postgresql'
+	runtimeOnly 'org.postgresql:postgresql'
 }
 
 ext {
@@ -96,6 +103,40 @@ tasks.register('copyDocument', Copy) {
 
 tasks.withType(JavaCompile).configureEach {
 	options.compilerArgs << '-parameters'
+}
+
+def localProperties = new Properties()
+def localFile = rootProject.file('.env')
+if (localFile.exists()) {
+	localFile.withInputStream { localProperties.load(it) }
+}
+
+jooq {
+	version = '3.16.9'
+	configurations {
+		main {
+			generateSchemaSourceOnCompilation = true
+			generationTool {
+				jdbc {
+					driver = 'org.postgresql.Driver'
+					url = localProperties.getProperty('SPRING_DATASOURCE_URL')
+					user = localProperties.getProperty('SPRING_DATASOURCE_USERNAME')
+					password = localProperties.getProperty('SPRING_DATASOURCE_PASSWORD')
+				}
+				generator {
+					name = 'org.jooq.codegen.DefaultGenerator'
+					database {
+						name = 'org.jooq.meta.postgres.PostgresDatabase'
+						inputSchema = 'public'
+					}
+					target {
+						packageName = 'com.deerear.jooq.generated'
+						directory = 'build/generated/jooq'
+					}
+				}
+			}
+		}
+	}
 }
 
 build {

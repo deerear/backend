@@ -15,7 +15,10 @@ import java.util.UUID;
 public class StaticFiles {
     public static String saveImage(MultipartFile file, String route, String id) {
 
-        String fileName = UUID.randomUUID().toString().replace("-", "");
+        String name = file.getName();
+        String extension = name.substring(name.lastIndexOf(".") + 1);
+
+        String fileName = UUID.randomUUID().toString().replace("-", "") + "." + extension;
         String dbPath = "/images/" + route + "/" + id + "/" + fileName;
 
         // Path 객체 생성

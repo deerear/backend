@@ -6,7 +6,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: "ubuntu:latest"
     services:
       postgres:
         image: postgres:16-alpine
@@ -25,7 +24,7 @@ jobs:
 
     - name: Init DB
       run: |
-        psql -h postgres -p 5432 -d ${{secrets.DB_NAME}} -c ${{secrets.DB_SQL}}
+        psql -h localhost -p 5432 -d ${{secrets.DB_NAME}} -c ${{secrets.DB_SQL}}
 
     - uses: actions/checkout@v4
 

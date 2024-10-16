@@ -1,7 +1,8 @@
 package com.deerear.app.domain;
 
 import com.deerear.app.dto.PostDto;
-import com.deerear.app.dto.PostResponseDto;
+import com.deerear.app.dto.PostDetailResponseDto;
+import com.deerear.app.dto.PostImageDto;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -65,14 +66,14 @@ public class Post extends Likeable {
         }
     }
 
-    public PostResponseDto toDto(Member member, List<String> imageUrls, Boolean isLike){
-        return PostResponseDto.builder()
+    public PostDetailResponseDto toDto(Member member, List<PostImageDto> postImageListDto, Boolean isLike){
+        return PostDetailResponseDto.builder()
                 .postId(id)
                 .nickname(member.getNickname())
                 .profileImg(member.getProfileImgUrl())
                 .title(title)
                 .content(content)
-                .postImgs(imageUrls)
+                .postImgs(postImageListDto)
                 .latitude(latitude)
                 .longitude(longitude)
                 .commentCount(commentCount)

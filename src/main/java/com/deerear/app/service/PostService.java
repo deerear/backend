@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -34,35 +33,29 @@ public class PostService {
     private final LikeRepository likeRepository;
 
     @Transactional(readOnly = true)
-    public PostResponseDto getPost(UUID postId) {
+    public PostDetailResponseDto getPost(UUID postId) {
 
         Post post = postRepository.findById(postId).orElseThrow(()-> new BizException("존재하지 않는 포스트 입니다.", ErrorCode.NOT_FOUND, ""));
         Member member = post.getMember();
         Boolean isLike = likeRepository.existsByMemberAndTargetTypeAndTargetId(member, Likeable.TargetType.POST, postId);
-        List<PostImage> postImgs = postImageRepository.findAllByPostId(postId);
-        List<String> imageUrls = postImgs.stream().map(PostImage::getImageUrl).toList();
+        List<PostImage> postImageList = postImageRepository.findAllByPostId(postId);
+        List<PostImageDto> postImageListDto = postImageList.stream().map(postImage -> PostImageDto.builder().id(postImage.getId()).url(postImage.getImageUrl()).build()).toList();
 
-        return post.toDto(member, imageUrls, isLike);
+        return post.toDto(member, postImageListDto, isLike);
     }
 
     @Transactional(readOnly = true)
-    public PostListResponseDto listPosts(CustomUserDetails customUserDetails, PostListRequestDto request, Optional<String> nextKey, Integer size){
+    public PostListResponseDto listPosts(CustomUserDetails customUserDetails, PostListRequestDto postListRequestDto, Optional<String> nextKey, Integer size){
 
         Member member = customUserDetails.getUser();
 
         List<Post> posts;
 
         if(nextKey.isEmpty()){
-            System.out.println("키 널 조회");
-            System.out.println("start lati :" + request.getStartLatitude());
-            System.out.println("start long :" + request.getStartLongitude());
-            System.out.println("end lati :" + request.getEndLatitude());
-            System.out.println("end long :" + request.getEndLongitude());
-            posts = postRepository.findNextPage(request.getStartLatitude(), request.getStartLongitude(), request.getEndLatitude(), request.getEndLongitude(), Pageable.ofSize(size+1));
+            posts = postRepository.findNextPage(postListRequestDto.getStartLatitude(), postListRequestDto.getStartLongitude(), postListRequestDto.getEndLatitude(), postListRequestDto.getEndLongitude(), Pageable.ofSize(size+1));
         } else {
-            System.out.println("키 조회");
             Post post = postRepository.getReferenceById(UUID.fromString(nextKey.orElseThrow()));
-            posts = postRepository.findNextPage(post.getCreatedAt(), post.getId() , request.getStartLatitude(), request.getStartLongitude(), request.getEndLatitude(), request.getEndLongitude(), Pageable.ofSize(size+1));
+            posts = postRepository.findNextPage(post.getCreatedAt(), post.getId() , postListRequestDto.getStartLatitude(), postListRequestDto.getStartLongitude(), postListRequestDto.getEndLatitude(), postListRequestDto.getEndLongitude(), Pageable.ofSize(size+1));
         }
 
         String key = "";
@@ -74,29 +67,29 @@ public class PostService {
             key = posts.get(posts.size()-1).getId().toString();
         }
 
-        List<PostDto> postDtos = new ArrayList<>();
+        List<PostDto> postListDto = new ArrayList<>();
         for(Post post : posts){
             Boolean isLike = likeRepository.existsByMemberAndTargetTypeAndTargetId(member, Likeable.TargetType.POST, post.getId());
-            postDtos.add(post.toDto(isLike));
+            postListDto.add(post.toDto(isLike));
         }
 
 
         return PostListResponseDto.builder()
-                .objects(postDtos)
+                .objects(postListDto)
                 .hasNext(hasNext)
                 .nextKey(key)
-                .size(postDtos.size())
+                .size(postListDto.size())
                 .build();
     }
 
     @Transactional
-    public void createPost(CustomUserDetails customUserDetails, PostRequestDto postRequestDto) {
+    public void createPost(CustomUserDetails customUserDetails, PostCreateRequestDto postCreateRequestDto) {
 
-        Post post = postRepository.save(postRequestDto.toEntity(customUserDetails.getUser()));
+        Post post = postRepository.save(postCreateRequestDto.toEntity(customUserDetails.getUser()));
 
         List<PostImage> postImages = new ArrayList<>();
 
-        for(MultipartFile image: postRequestDto.getPostImgs()){
+        for(MultipartFile image: postCreateRequestDto.getPostImgs()){
             String path = saveImage(image, "posts", post.getId().toString());
             PostImage postImage = PostImage.builder().post(post).imageUrl(path).build();
             postImages.add(postImage);
@@ -106,23 +99,27 @@ public class PostService {
     }
 
     @Transactional
-    public void updatePost(CustomUserDetails customUserDetails, UUID postId, PostRequestDto postRequestDto) {
+    public void updatePost(CustomUserDetails customUserDetails, UUID postId, PostUpdateRequestDto postUpdateRequestDto) {
 
         Member member = customUserDetails.getUser();
 
-        validate(member, postRequestDto.toEntity(member));
+        validate(member, postUpdateRequestDto.toEntity(member));
 
         Post post = postRepository.findById(postId).orElseThrow(()-> new BizException("존재하지 않는 포스트 입니다.", ErrorCode.NOT_FOUND, ""));
 
         List<PostImage> postImgs = postImageRepository.findAllByPostId(postId);
+        List<String> imageUrls = postImgs.stream().map(PostImage::getImageUrl).toList();
 
-        for(MultipartFile image: postRequestDto.getPostImgs()){
+        for(MultipartFile image: postUpdateRequestDto.getPostImgs()){
             String path = saveImage(image, "posts", post.getId().toString());
             PostImage postImage = PostImage.builder().post(post).imageUrl(path).build();
             postImageRepository.save(postImage);
         }
 
-        return;
+        post.setTitle(postUpdateRequestDto.getTitle());
+        post.setContent(postUpdateRequestDto.getContent());
+
+        return ;
     }
 
     @Transactional

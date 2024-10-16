@@ -1,9 +1,6 @@
 package com.deerear.app.controller;
 
-import com.deerear.app.dto.PostListRequestDto;
-import com.deerear.app.dto.PostListResponseDto;
-import com.deerear.app.dto.PostRequestDto;
-import com.deerear.app.dto.PostResponseDto;
+import com.deerear.app.dto.*;
 import com.deerear.app.service.CustomUserDetails;
 import com.deerear.app.service.PostService;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -31,18 +27,18 @@ public class PostController {
         return ResponseEntity.ok(postService.listPosts(customUserDetails, request, nextKey, size));
     }
     @GetMapping("/{postId}")
-    public ResponseEntity<PostResponseDto> getPost(@PathVariable UUID postId) {
+    public ResponseEntity<PostDetailResponseDto> getPost(@PathVariable UUID postId) {
         return ResponseEntity.ok(postService.getPost(postId));
     }
 
     @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Object> createPost(@AuthenticationPrincipal CustomUserDetails customUserDetails, @ModelAttribute PostRequestDto request){
+    public ResponseEntity<Object> createPost(@AuthenticationPrincipal CustomUserDetails customUserDetails, @ModelAttribute PostCreateRequestDto request){
         postService.createPost(customUserDetails, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(null);
     }
 
     @PutMapping(value = "/{postId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Object> updatePost(@AuthenticationPrincipal CustomUserDetails customUserDetails, @PathVariable UUID postId, @ModelAttribute PostRequestDto request){
+    public ResponseEntity<Object> updatePost(@AuthenticationPrincipal CustomUserDetails customUserDetails, @PathVariable UUID postId, @ModelAttribute PostUpdateRequestDto request){
         postService.updatePost(customUserDetails, postId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(null);
     }

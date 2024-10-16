@@ -1,8 +1,5 @@
 package com.deerear.app.dto;
 
-import com.deerear.app.domain.Member;
-import com.deerear.app.domain.Post;
-import com.deerear.app.domain.PostImage;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -15,14 +12,14 @@ import java.util.UUID;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class PostResponseDto {
+public class PostDetailResponseDto {
 
     private UUID postId;
     private String nickname;
     private String profileImg;
     private String title;
     private String content;
-    private List<String> postImgs;
+    private List<PostImageDto> postImgs;
     private BigDecimal latitude;
     private BigDecimal longitude;
     private Long commentCount;

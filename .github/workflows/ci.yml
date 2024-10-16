@@ -24,7 +24,7 @@ jobs:
 
     - name: Init DB
       run: |
-        PGPASSWORD=${{secrets.SPRING_DATASOURCE_PASSWORD}} psql -h localhost -p 5432 -d ${{secrets.DB_NAME}} -W ${{secrets.SPRING_DATASOURCE_PASSWORD}} <<EOF ${{secrets.DB_SQL}} EOF
+        PGPASSWORD=${{secrets.SPRING_DATASOURCE_PASSWORD}} psql -U ${{secrets.SPRING_DATASOURCE_USERNAME}} -h localhost -p 5432 -d ${{secrets.DB_NAME}} <<EOF ${{secrets.DB_SQL}} EOF
 
     - uses: actions/checkout@v4
 

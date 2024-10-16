@@ -54,7 +54,7 @@ jobs:
       run: |
         chmod +x ./gradlew
         ./gradlew clean
-        ./gradlew --info build --configuration-cache
+        ./gradlew --info build
     
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4

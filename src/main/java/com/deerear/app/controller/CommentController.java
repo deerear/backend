@@ -1,6 +1,8 @@
 package com.deerear.app.controller;
 
-import com.deerear.app.dto.*;
+import com.deerear.app.dto.CommentSaveRequestDto;
+import com.deerear.app.dto.PagingRequestDto;
+import com.deerear.app.dto.PagingResponseDto;
 import com.deerear.app.service.CommentService;
 import com.deerear.app.service.CustomUserDetails;
 import com.deerear.exception.BizException;
@@ -12,7 +14,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 import static com.deerear.constant.ErrorCode.NOT_NULL;
@@ -54,9 +55,9 @@ public class CommentController {
     }
 
     @GetMapping("{postId}")
-    public ResponseEntity<List<CommentListResponseDto>> listComment(@AuthenticationPrincipal CustomUserDetails customUserDetails,
-                                                                    @PathVariable UUID postId,
-                                                                    @RequestBody PagingRequestDto page) {
+    public ResponseEntity<PagingResponseDto> listComment(@AuthenticationPrincipal CustomUserDetails customUserDetails,
+                                                                @PathVariable UUID postId,
+                                                                @RequestBody PagingRequestDto page) {
         return ResponseEntity.ok(commentService.listComment(customUserDetails.getUser(), postId, page));
     }
 }

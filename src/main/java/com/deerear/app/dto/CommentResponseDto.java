@@ -5,16 +5,20 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+import java.util.UUID;
+
 @Builder
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CommentListResponseDto extends PagingResponseDto{
+public class CommentResponseDto {
 
-    private String commentId;
+    private UUID commentId;
     private String nickName;
-    private String postId;
+    private UUID postId;
     private String content;
     private long likeCount;
-    private Boolean isLike;
+    private boolean isLiked;
+    private LocalDateTime createdAt;
 }

@@ -23,10 +23,8 @@ jobs:
         sudo apt-get install --yes --no-install-recommends postgresql-client
 
     - name: Init DB
-      env:
-        POSTGRES_PASSWORD: ${{secrets.SPRING_DATASOURCE_PASSWORD}}
       run: |
-        psql -h localhost -p 5432 -d ${{secrets.DB_NAME}} -c ${{secrets.DB_SQL}}
+        psql -h localhost -p 5432 -d ${{secrets.DB_NAME}} -W ${{secrets.SPRING_DATASOURCE_PASSWORD}} -c ${{secrets.DB_SQL}}
 
     - uses: actions/checkout@v4
 

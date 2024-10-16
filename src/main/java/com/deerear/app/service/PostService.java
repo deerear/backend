@@ -10,8 +10,16 @@ import com.deerear.constant.ErrorCode;
 import com.deerear.exception.BizException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -42,6 +50,37 @@ public class PostService {
         List<PostImageDto> postImageListDto = postImageList.stream().map(postImage -> PostImageDto.builder().id(postImage.getId()).url(postImage.getImageUrl()).build()).toList();
 
         return post.toDto(member, postImageListDto, isLike);
+    }
+
+    @Transactional(readOnly = true)
+    public PagingResponseDto getPosts(Member member, PagingRequestDto pagingRequestDto) {
+        String lastPostId = pagingRequestDto.getKey(); // 커서로 사용될 key
+        int size = pagingRequestDto.getSize();
+
+        PageRequest pageRequest = PageRequest.of(0, size); // 페이징 처리
+
+        List<Post> posts;
+        if (lastPostId == null) {
+            // 첫 페이지를 요청하는 경우
+            posts = postRepository.findFirstByMember(member, pageRequest);
+        } else {
+            // 커서를 기준으로 그 이후의 게시물을 가져옴
+            posts = postRepository.findPostsByMemberAndIdGreaterThan(member, UUID.fromString(lastPostId), pageRequest);
+        }
+
+        boolean hasNext = posts.size() == size; // 다음 페이지 여부 확인
+
+        List<Object> postDtos = posts.stream()
+                .map(post -> MemberGetPostsResponseDto.toDto(
+                        post.getId(),
+                        post.getTitle(),
+                        post.getContent(),
+                        post.getCreatedAt()
+                ))
+                .collect(Collectors.toList());
+
+        // 게시글 리스트와 페이징 정보를 담은 PagedResponseDto 반환
+        return new PagingResponseDto(postDtos, size, lastPostId, hasNext);
     }
 
     @Transactional(readOnly = true)

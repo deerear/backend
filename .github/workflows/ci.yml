@@ -24,7 +24,7 @@ jobs:
 
     - name: Init DB
       env:
-        PGPASSWORD: ${{secrets.SPRING_DATASOURCE_PASSWORD}}
+        POSTGRES_PASSWORD: ${{secrets.SPRING_DATASOURCE_PASSWORD}}
       run: |
         psql -h localhost -p 5432 -d ${{secrets.DB_NAME}} -c ${{secrets.DB_SQL}}
 

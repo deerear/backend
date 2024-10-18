@@ -8,6 +8,7 @@ import com.deerear.app.repository.PostImageRepository;
 import com.deerear.app.repository.PostRepository;
 import com.deerear.constant.ErrorCode;
 import com.deerear.exception.BizException;
+import io.jsonwebtoken.lang.Assert;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -44,11 +45,17 @@ public class PostService {
     @Transactional(readOnly = true)
     public PostDetailResponseDto getPost(UUID postId) {
 
-        Post post = postRepository.findById(postId).orElseThrow(()-> new BizException("존재하지 않는 포스트 입니다.", ErrorCode.NOT_FOUND, ""));
+        Post post = postRepository.getReferenceById(postId);
         Member member = post.getMember();
+
+        List<PostImageDto> postImageListDto = postImageRepository.findAllByPostId(postId).stream()
+                .map(postImage -> PostImageDto.builder()
+                                .id(postImage.getId())
+                                .url(postImage.getImageUrl())
+                                .build())
+                .toList();
+
         Boolean isLike = likeRepository.existsByMemberAndTargetTypeAndTargetId(member, Likeable.TargetType.POST, postId);
-        List<PostImage> postImageList = postImageRepository.findAllByPostId(postId);
-        List<PostImageDto> postImageListDto = postImageList.stream().map(postImage -> PostImageDto.builder().id(postImage.getId()).url(postImage.getImageUrl()).build()).toList();
 
         return post.toDto(member, postImageListDto, isLike);
     }
@@ -76,8 +83,7 @@ public class PostService {
                         post.getId(),
                         post.getTitle(),
                         post.getContent(),
-                        post.getCreatedAt()
-                ))
+                        post.getCreatedAt()))
                 .collect(Collectors.toList());
 
         // 게시글 리스트와 페이징 정보를 담은 PagedResponseDto 반환
@@ -107,11 +113,11 @@ public class PostService {
             key = posts.get(posts.size()-1).getId().toString();
         }
 
-        List<PostDto> postListDto = new ArrayList<>();
-        for(Post post : posts){
-            Boolean isLike = likeRepository.existsByMemberAndTargetTypeAndTargetId(member, Likeable.TargetType.POST, post.getId());
-            postListDto.add(post.toDto(isLike));
-        }
+        List<PostDto> postListDto = posts.stream()
+                .map(post -> PostDto.builder()
+                                .isLike(likeRepository.existsByMemberAndTargetTypeAndTargetId(member, Likeable.TargetType.POST, post.getId()))
+                                .build())
+                .toList();
 
 
         return PostListResponseDto.builder()
@@ -136,7 +142,6 @@ public class PostService {
             }
             postImageRepository.saveAll(postImages);
         }
-
     }
 
     @Transactional
@@ -146,7 +151,7 @@ public class PostService {
 
         validate(member, postUpdateRequestDto.toEntity(member));
 
-        Post post = postRepository.findById(postId).orElseThrow(()-> new BizException("존재하지 않는 포스트 입니다.", ErrorCode.NOT_FOUND, ""));
+        Post post = postRepository.getReferenceById(postId);
 
         if (postUpdateRequestDto.getPostImgs() != null){
             for(MultipartFile image: postUpdateRequestDto.getPostImgs()){
@@ -158,15 +163,13 @@ public class PostService {
 
         post.setTitle(postUpdateRequestDto.getTitle());
         post.setContent(postUpdateRequestDto.getContent());
-
-        return ;
     }
 
     @Transactional
     public void deletePost(CustomUserDetails customUserDetails, UUID postId) {
 
         Member member = customUserDetails.getUser();
-        Post post = postRepository.findById(postId).orElseThrow(()-> new BizException("존재하지 않는 포스트 입니다.", ErrorCode.NOT_FOUND, ""));
+        Post post = postRepository.getReferenceById(postId);
         validate(member, post);
 
         post.setIsDeleted(true);

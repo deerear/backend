@@ -56,9 +56,9 @@ public class PostService {
     @Transactional(readOnly = true)
     public PagingResponseDto getPosts(Member member, PagingRequestDto pagingRequestDto) {
         String lastPostId = pagingRequestDto.getKey(); // 커서로 사용될 key
-        int size = pagingRequestDto.getSize();
+        //int size = pagingRequestDto.getSize();
 
-        PageRequest pageRequest = PageRequest.of(0, size); // 페이징 처리
+        PageRequest pageRequest = PageRequest.of(0, 10); // 페이징 처리
 
         List<Post> posts;
         if (lastPostId == null) {
@@ -69,7 +69,7 @@ public class PostService {
             posts = postRepository.findPostsByMemberAndIdGreaterThan(member, UUID.fromString(lastPostId), pageRequest);
         }
 
-        boolean hasNext = posts.size() == size; // 다음 페이지 여부 확인
+        boolean hasNext = posts.size() == 10; // 다음 페이지 여부 확인
 
         List<Object> postDtos = posts.stream()
                 .map(post -> MemberGetPostsResponseDto.toDto(
@@ -81,7 +81,7 @@ public class PostService {
                 .collect(Collectors.toList());
 
         // 게시글 리스트와 페이징 정보를 담은 PagedResponseDto 반환
-        return new PagingResponseDto(postDtos, size, lastPostId, hasNext);
+        return new PagingResponseDto(postDtos, 10, lastPostId, hasNext);
     }
 
     @Transactional(readOnly = true)

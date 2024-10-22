@@ -85,7 +85,7 @@ public class Post extends Likeable {
 
     public PostDto toDto(Boolean isLike){
         return PostDto.builder()
-                .id(id)
+                .postId(id)
                 .title(title)
                 .content(content)
                 .thumbnail(thumbnail)

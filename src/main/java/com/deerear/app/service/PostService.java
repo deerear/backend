@@ -3,30 +3,23 @@ package com.deerear.app.service;
 import com.deerear.app.domain.*;
 import com.deerear.app.dto.*;
 import com.deerear.app.repository.LikeRepository;
-import com.deerear.app.repository.MemberRepository;
 import com.deerear.app.repository.PostImageRepository;
 import com.deerear.app.repository.PostRepository;
 import com.deerear.constant.ErrorCode;
 import com.deerear.exception.BizException;
-import io.jsonwebtoken.lang.Assert;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 
 
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -39,7 +32,6 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final PostImageRepository postImageRepository;
-    private final MemberRepository memberRepository;
     private final LikeRepository likeRepository;
 
     @Transactional(readOnly = true)
@@ -91,39 +83,49 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public PostListResponseDto listPosts(CustomUserDetails customUserDetails, PostListRequestDto postListRequestDto, Optional<String> nextKey, Integer size){
+    public PostListResponseDto listPosts(CustomUserDetails customUserDetails, PostListRequestDto postListRequestDto, String key, Integer size){
 
         Member member = customUserDetails.getUser();
 
         List<Post> posts;
 
-        if(nextKey.isEmpty()){
+        try {
+            UUID postId = UUID.fromString(key);
+            Post post = postRepository.getReferenceById(postId);
+            posts = postRepository.findNextPage(post.getCreatedAt(), post.getId(), postListRequestDto.getStartLatitude(), postListRequestDto.getStartLongitude(), postListRequestDto.getEndLatitude(), postListRequestDto.getEndLongitude(), Pageable.ofSize(size+1));
+        } catch (IllegalArgumentException e) {
             posts = postRepository.findNextPage(postListRequestDto.getStartLatitude(), postListRequestDto.getStartLongitude(), postListRequestDto.getEndLatitude(), postListRequestDto.getEndLongitude(), Pageable.ofSize(size+1));
-        } else {
-            Post post = postRepository.getReferenceById(UUID.fromString(nextKey.orElseThrow()));
-            posts = postRepository.findNextPage(post.getCreatedAt(), post.getId() , postListRequestDto.getStartLatitude(), postListRequestDto.getStartLongitude(), postListRequestDto.getEndLatitude(), postListRequestDto.getEndLongitude(), Pageable.ofSize(size+1));
         }
 
-        String key = "";
+        String nextKey = "";
         boolean hasNext = false;
 
         if (posts.size() == 11){
             posts = posts.subList(0,10);
             hasNext = true;
-            key = posts.get(posts.size()-1).getId().toString();
+            nextKey = posts.get(posts.size()-1).getId().toString();
         }
 
         List<PostDto> postListDto = posts.stream()
                 .map(post -> PostDto.builder()
-                                .isLike(likeRepository.existsByMemberAndTargetTypeAndTargetId(member, Likeable.TargetType.POST, post.getId()))
-                                .build())
+                        .postId(post.getId())
+                        .title(post.getTitle())
+                        .content(post.getContent())
+                        .thumbnail(post.getThumbnail())
+                        .commentCount(post.getCommentCount())
+                        .isLike(likeRepository.existsByMemberAndTargetTypeAndTargetId(member, Likeable.TargetType.POST, post.getId()))
+                        .likesCount(post.getLikeCount())
+                        .latitude(post.getLatitude())
+                        .longitude(post.getLongitude())
+                        .createdAt(post.getCreatedAt())
+                        .build())
                 .toList();
 
 
         return PostListResponseDto.builder()
                 .objects(postListDto)
                 .hasNext(hasNext)
-                .nextKey(key)
+                .nextKey(nextKey)
                 .size(postListDto.size())
                 .build();
     }
@@ -131,7 +133,9 @@ public class PostService {
     @Transactional
     public void createPost(CustomUserDetails customUserDetails, PostCreateRequestDto postCreateRequestDto) {
 
-        Post post = postRepository.save(postCreateRequestDto.toEntity(customUserDetails.getUser()));
+        String thumbnail = "";
+
+        Post post = postRepository.save(postCreateRequestDto.toEntity(customUserDetails.getUser(), thumbnail));
 
         if (postCreateRequestDto.getPostImgs() != null) {
             List<PostImage> postImages = new ArrayList<>();

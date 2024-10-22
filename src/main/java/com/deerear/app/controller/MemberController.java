@@ -10,12 +10,14 @@ import com.deerear.app.service.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Slf4j
 @RestController
@@ -76,4 +78,16 @@ public class MemberController {
         MemberGetProfileResponseDto responseDto = memberService.getProfile(member);
         return ResponseEntity.ok(responseDto);
     }
+
+    @PutMapping(value = "/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Object> updateProfile(
+            @AuthenticationPrincipal CustomUserDetails customUserDetails,
+            @ModelAttribute MemberUpdateRequestDto request) {
+
+        // 프로필 업데이트 로직
+        memberService.updateProfile(customUserDetails, request);
+
+        return ResponseEntity.status(HttpStatus.OK).body("프로필이 성공적으로 업데이트되었습니다.");
+    }
+
 }

@@ -36,7 +36,7 @@ public class StaticFiles {
             }
 
             if (isResize){
-                resizeAndSave(file, String.valueOf(path), fileName, extension);
+                resizeAndSave(file, String.valueOf(path), extension);
             } else {
                 Files.write(path, file.getBytes());
             }
@@ -48,7 +48,7 @@ public class StaticFiles {
         return dbPath;
     }
 
-    private static void resizeAndSave(MultipartFile file, String path, String name, String extension) throws IOException {
+    private static void resizeAndSave(MultipartFile file, String path, String extension) throws IOException {
 
         BufferedImage originalImage = ImageIO.read(new ByteArrayInputStream(file.getBytes()));
 
@@ -84,7 +84,7 @@ public class StaticFiles {
         graphics2D.drawImage(originalImage, 0, 0, width, height, null);
         graphics2D.dispose();
 
-        File saveFile = new File(path + name);
+        File saveFile = new File(path);
 
         ImageIO.write(resizedImage, extension, saveFile);
     }

@@ -134,13 +134,20 @@ public class PostService {
     public void createPost(CustomUserDetails customUserDetails, PostCreateRequestDto postCreateRequestDto) {
 
         String thumbnail = "";
+        List<MultipartFile> images = postCreateRequestDto.getPostImgs();
+
+        if (images.size() > 0) {
+            MultipartFile firstImage = images.get(0);
+            thumbnail = saveImage(firstImage, "posts","thumbnails",true);
+        }
+
 
         Post post = postRepository.save(postCreateRequestDto.toEntity(customUserDetails.getUser(), thumbnail));
 
-        if (postCreateRequestDto.getPostImgs() != null) {
+        if (images.size() > 0) {
             List<PostImage> postImages = new ArrayList<>();
             for(MultipartFile image: postCreateRequestDto.getPostImgs()){
-                String path = saveImage(image, "posts", post.getId().toString());
+                String path = saveImage(image, "posts", post.getId().toString(), false);
                 PostImage postImage = PostImage.builder().post(post).imageUrl(path).build();
                 postImages.add(postImage);
             }
@@ -159,7 +166,7 @@ public class PostService {
 
         if (postUpdateRequestDto.getPostImgs() != null){
             for(MultipartFile image: postUpdateRequestDto.getPostImgs()){
-                String path = saveImage(image, "posts", post.getId().toString());
+                String path = saveImage(image, "posts", post.getId().toString(), false);
                 PostImage postImage = PostImage.builder().post(post).imageUrl(path).build();
                 postImageRepository.save(postImage);
             }

@@ -44,13 +44,11 @@ public class SecurityConfig {
                         .requestMatchers("/api/members/sign-in").permitAll()
                         .requestMatchers("/api/members/check-nickname").permitAll()
                         .requestMatchers("/api/members/check-email").permitAll()
-                        .requestMatchers("/api/members/login").permitAll()
+                        .requestMatchers("/api/members/login/**").permitAll()
                         // 리프레시 토큰 API는 인증된 사용자만 접근 가능
                         .requestMatchers("/api/token/refresh").permitAll()
                         // ADMIN 권한이 있어야 요청할 수 있음
                         .requestMatchers("/api/admins/**").hasRole("ADMIN")
-                        // 이 밖에 모든 요청에 대해서 인증을 필요로 한다는 설정
-                        .requestMatchers("/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilter(corsConfig.corsFilter())

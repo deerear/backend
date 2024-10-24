@@ -13,7 +13,7 @@ import java.util.UUID;
 @Builder
 public class PostDto{
 
-    private UUID id;
+    private UUID postId;
     private String title;
     private String content;
     private String thumbnail;

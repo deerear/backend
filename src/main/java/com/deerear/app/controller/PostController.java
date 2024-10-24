@@ -22,13 +22,14 @@ public class PostController {
 
     private final PostService postService;
 
-    @GetMapping("")
-    public ResponseEntity<PostListResponseDto> listPosts(@AuthenticationPrincipal CustomUserDetails customUserDetails, PostListRequestDto request, @RequestParam Optional<String> nextKey, @RequestParam Integer size) {
-        return ResponseEntity.ok(postService.listPosts(customUserDetails, request, nextKey, size));
-    }
     @GetMapping("/{postId}")
     public ResponseEntity<PostDetailResponseDto> getPost(@PathVariable UUID postId) {
         return ResponseEntity.ok(postService.getPost(postId));
+    }
+
+    @GetMapping("")
+    public ResponseEntity<PostListResponseDto> listPosts(@AuthenticationPrincipal CustomUserDetails customUserDetails, PostListRequestDto request, @RequestParam String nextKey, @RequestParam Integer size) {
+        return ResponseEntity.ok(postService.listPosts(customUserDetails, request, nextKey, size));
     }
 
     @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

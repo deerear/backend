@@ -46,9 +46,9 @@ public class CommentService {
     @Transactional(readOnly = true)
     public PagingResponseDto getComments(Member member, PagingRequestDto pagingRequestDto) {
         String lastPostId = pagingRequestDto.getKey();
-        int size = pagingRequestDto.getSize();
+        //int size = pagingRequestDto.getSize();
 
-        PageRequest pageRequest = PageRequest.of(0, size); // 페이징 처리
+        PageRequest pageRequest = PageRequest.of(0, 10); // 페이징 처리
 
         List<Post> comments;
         if (lastPostId == null) {
@@ -59,7 +59,7 @@ public class CommentService {
             comments = commentRepository.findCommentsByMemberAndIdGreaterThan(member, UUID.fromString(lastPostId), pageRequest);
         }
 
-        boolean hasNext = comments.size() == size; // 다음 페이지 여부 확인
+        boolean hasNext = comments.size() == 10; // 다음 페이지 여부 확인
 
         List<Object> commentDtos = comments.stream()
                 .map(post -> MemberGetCommentssResponseDto.toDto(
@@ -69,7 +69,7 @@ public class CommentService {
                 ))
                 .collect(Collectors.toList());
 
-        return new PagingResponseDto(commentDtos, size, lastPostId, hasNext);
+        return new PagingResponseDto(commentDtos, 10, lastPostId, hasNext);
     }
 
     @Transactional

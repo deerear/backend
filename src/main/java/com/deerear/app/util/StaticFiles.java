@@ -90,5 +90,17 @@ public class StaticFiles {
 
         ImageIO.write(resizedImage, extension, saveFile);
 
+    //TODO 남재현 작성 테스트 필요.
+    public static void deleteImage(String dbPath) {
+        Path path = Paths.get("./app" + dbPath);
+        try {
+            // 파일이 존재하는지 확인 후 삭제
+            if (Files.exists(path)) {
+                Files.delete(path);
+            }
+        } catch (IOException e) {
+            throw new BizException("이미지 삭제에 실패했습니다.", ErrorCode.INVALID_INPUT, "");
+        }
     }
+  
 }

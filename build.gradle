@@ -68,6 +68,9 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-jooq'
 	jooqGenerator 'org.postgresql:postgresql'
 	runtimeOnly 'org.postgresql:postgresql'
+
+	//Webflux
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 }
 
 ext {

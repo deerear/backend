@@ -1,6 +1,8 @@
 package com.deerear.app.service;
 
 import com.deerear.app.domain.Member;
+import com.deerear.app.domain.Post;
+import com.deerear.app.domain.PostImage;
 import com.deerear.app.dto.*;
 import com.deerear.app.repository.MemberRepository;
 import com.deerear.constant.ErrorCode;
@@ -14,8 +16,13 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Optional;
+import java.util.UUID;
+
+import static com.deerear.app.util.StaticFiles.deleteImage;
+import static com.deerear.app.util.StaticFiles.saveImage;
 
 @Service
 @RequiredArgsConstructor
@@ -100,6 +107,54 @@ public class MemberService {
         validateCheckEmail(requestDto);
 
         return MemberCheckEmailResponseDto.toDto(true);  // 사용 가능한 닉네임이면 true 반환
+    }
+
+    @Transactional
+    public void updateProfile(CustomUserDetails customUserDetails, MemberUpdateRequestDto memberUpdateRequestDto) {
+        Member member = customUserDetails.getUser();
+
+        // 멤버 정보를 업데이트하기 전에 유효성 검사
+        validateProfileUpdate(memberUpdateRequestDto);
+
+        // 프로필 이미지가 포함되어 있으면 저장
+        if (memberUpdateRequestDto.getProfileImg() != null) {
+            String path = saveImage(memberUpdateRequestDto.getProfileImg(), "members", member.getId().toString());
+            member.setProfileImgUrl(path);
+        } else if (memberUpdateRequestDto.getProfileImg() == null) {
+            // 프로필 이미지가 없고 기존 이미지가 있다면 삭제
+            deleteImage(member.getProfileImgUrl());
+            member.setProfileImgUrl(null); // 프로필 이미지 URL을 null로 설정
+        }
+
+        // 다른 회원 정보 업데이트
+        member.setNickname(memberUpdateRequestDto.getNickname());
+
+        memberRepository.save(member); // 변경된 멤버 정보 저장
+    }
+
+    private void validateProfileUpdate(MemberUpdateRequestDto memberUpdateRequestDto) {
+        // 닉네임 유효성 검사
+        if (memberUpdateRequestDto.getNickname() == null || memberUpdateRequestDto.getNickname().isEmpty()) {
+            throw new BizException("닉네임을 입력해주세요.", ErrorCode.INVALID_INPUT, "nickname: " + memberUpdateRequestDto.getNickname());
+        }
+
+        // 닉네임 중복 체크
+        if (memberRepository.existsByNickname(memberUpdateRequestDto.getNickname())) {
+            throw new BizException("이미 사용 중인 닉네임입니다.", ErrorCode.USERNAME_ALREADY_EXISTS, "nickname: " + memberUpdateRequestDto.getNickname());
+        }
+
+        // 이미지 유효성 검사 (프로필 이미지가 있을 때)
+        MultipartFile profileImage = memberUpdateRequestDto.getProfileImg();
+        if (profileImage != null && !isValidImageFormat(profileImage)) {
+            throw new BizException("유효하지 않은 이미지 형식입니다.", ErrorCode.INVALID_INPUT, "profileImage");
+        }
+    }
+
+    // 이미지 형식 유효성 검사
+    private boolean isValidImageFormat(MultipartFile image) {
+        String contentType = image.getContentType();
+        //TODO 이미지 형식 더 추가해야할듯
+        return contentType != null && (contentType.equals("image/jpeg") || contentType.equals("image/png"));
     }
 
     private void validateCheckEmail(MemberCheckEmailRequestDto memberCheckEmailRequestDto) {

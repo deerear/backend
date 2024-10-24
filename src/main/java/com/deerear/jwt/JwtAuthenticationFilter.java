@@ -27,12 +27,15 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         String path = httpRequest.getRequestURI();
 
-        // 해당 API요청을 token 검증하지 않음.
+        // 해당 API 요청을 token 검증하지 않음.
         if ("/api/members/sign-up".equals(path)
                 || "/api/members/sign-in".equals(path)
-                ||  "/api/members/check-nickname".equals(path)
-                ||  "/api/members/check-email".equals(path)
-                ||  path.startsWith("/images")
+                || "/api/members/check-nickname".equals(path)
+                || "/api/members/login/**".equals(path)
+                || "/api/token/refresh".equals(path)
+                || path.startsWith("/docs")
+                || path.startsWith("/restdoc")
+                || path.startsWith("/images")
         ) {
             chain.doFilter(request, response);
             return;

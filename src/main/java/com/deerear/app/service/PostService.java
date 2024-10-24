@@ -3,7 +3,6 @@ package com.deerear.app.service;
 import com.deerear.app.domain.*;
 import com.deerear.app.dto.*;
 import com.deerear.app.repository.LikeRepository;
-import com.deerear.app.repository.MemberRepository;
 import com.deerear.app.repository.PostImageRepository;
 import com.deerear.app.repository.PostRepository;
 import com.deerear.constant.ErrorCode;
@@ -13,19 +12,14 @@ import lombok.extern.slf4j.Slf4j;
 
 
 
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -38,17 +32,22 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final PostImageRepository postImageRepository;
-    private final MemberRepository memberRepository;
     private final LikeRepository likeRepository;
 
     @Transactional(readOnly = true)
     public PostDetailResponseDto getPost(UUID postId) {
 
-        Post post = postRepository.findById(postId).orElseThrow(()-> new BizException("존재하지 않는 포스트 입니다.", ErrorCode.NOT_FOUND, ""));
+        Post post = postRepository.getReferenceById(postId);
         Member member = post.getMember();
+
+        List<PostImageDto> postImageListDto = postImageRepository.findAllByPostId(postId).stream()
+                .map(postImage -> PostImageDto.builder()
+                                .id(postImage.getId())
+                                .url(postImage.getImageUrl())
+                                .build())
+                .toList();
+
         Boolean isLike = likeRepository.existsByMemberAndTargetTypeAndTargetId(member, Likeable.TargetType.POST, postId);
-        List<PostImage> postImageList = postImageRepository.findAllByPostId(postId);
-        List<PostImageDto> postImageListDto = postImageList.stream().map(postImage -> PostImageDto.builder().id(postImage.getId()).url(postImage.getImageUrl()).build()).toList();
 
         return post.toDto(member, postImageListDto, isLike);
     }
@@ -76,8 +75,7 @@ public class PostService {
                         post.getId(),
                         post.getTitle(),
                         post.getContent(),
-                        post.getCreatedAt()
-                ))
+                        post.getCreatedAt()))
                 .collect(Collectors.toList());
 
         // 게시글 리스트와 페이징 정보를 담은 PagedResponseDto 반환
@@ -85,39 +83,49 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public PostListResponseDto listPosts(CustomUserDetails customUserDetails, PostListRequestDto postListRequestDto, Optional<String> nextKey, Integer size){
+    public PostListResponseDto listPosts(CustomUserDetails customUserDetails, PostListRequestDto postListRequestDto, String key, Integer size){
 
         Member member = customUserDetails.getUser();
 
         List<Post> posts;
 
-        if(nextKey.isEmpty()){
+        try {
+            UUID postId = UUID.fromString(key);
+            Post post = postRepository.getReferenceById(postId);
+            posts = postRepository.findNextPage(post.getCreatedAt(), post.getId(), postListRequestDto.getStartLatitude(), postListRequestDto.getStartLongitude(), postListRequestDto.getEndLatitude(), postListRequestDto.getEndLongitude(), Pageable.ofSize(size+1));
+        } catch (IllegalArgumentException e) {
             posts = postRepository.findNextPage(postListRequestDto.getStartLatitude(), postListRequestDto.getStartLongitude(), postListRequestDto.getEndLatitude(), postListRequestDto.getEndLongitude(), Pageable.ofSize(size+1));
-        } else {
-            Post post = postRepository.getReferenceById(UUID.fromString(nextKey.orElseThrow()));
-            posts = postRepository.findNextPage(post.getCreatedAt(), post.getId() , postListRequestDto.getStartLatitude(), postListRequestDto.getStartLongitude(), postListRequestDto.getEndLatitude(), postListRequestDto.getEndLongitude(), Pageable.ofSize(size+1));
         }
 
-        String key = "";
+        String nextKey = "";
         boolean hasNext = false;
 
         if (posts.size() == 11){
             posts = posts.subList(0,10);
             hasNext = true;
-            key = posts.get(posts.size()-1).getId().toString();
+            nextKey = posts.get(posts.size()-1).getId().toString();
         }
 
-        List<PostDto> postListDto = new ArrayList<>();
-        for(Post post : posts){
-            Boolean isLike = likeRepository.existsByMemberAndTargetTypeAndTargetId(member, Likeable.TargetType.POST, post.getId());
-            postListDto.add(post.toDto(isLike));
-        }
+        List<PostDto> postListDto = posts.stream()
+                .map(post -> PostDto.builder()
+                        .postId(post.getId())
+                        .title(post.getTitle())
+                        .content(post.getContent())
+                        .thumbnail(post.getThumbnail())
+                        .commentCount(post.getCommentCount())
+                        .isLike(likeRepository.existsByMemberAndTargetTypeAndTargetId(member, Likeable.TargetType.POST, post.getId()))
+                        .likesCount(post.getLikeCount())
+                        .latitude(post.getLatitude())
+                        .longitude(post.getLongitude())
+                        .createdAt(post.getCreatedAt())
+                        .build())
+                .toList();
 
 
         return PostListResponseDto.builder()
                 .objects(postListDto)
                 .hasNext(hasNext)
-                .nextKey(key)
+                .nextKey(nextKey)
                 .size(postListDto.size())
                 .build();
     }
@@ -125,18 +133,26 @@ public class PostService {
     @Transactional
     public void createPost(CustomUserDetails customUserDetails, PostCreateRequestDto postCreateRequestDto) {
 
-        Post post = postRepository.save(postCreateRequestDto.toEntity(customUserDetails.getUser()));
+        String thumbnail = "";
+        List<MultipartFile> images = postCreateRequestDto.getPostImgs();
 
-        if (postCreateRequestDto.getPostImgs() != null) {
+        if (images.size() > 0) {
+            MultipartFile firstImage = images.get(0);
+            thumbnail = saveImage(firstImage, "posts","thumbnails",true);
+        }
+
+
+        Post post = postRepository.save(postCreateRequestDto.toEntity(customUserDetails.getUser(), thumbnail));
+
+        if (images.size() > 0) {
             List<PostImage> postImages = new ArrayList<>();
             for(MultipartFile image: postCreateRequestDto.getPostImgs()){
-                String path = saveImage(image, "posts", post.getId().toString());
+                String path = saveImage(image, "posts", post.getId().toString(), false);
                 PostImage postImage = PostImage.builder().post(post).imageUrl(path).build();
                 postImages.add(postImage);
             }
             postImageRepository.saveAll(postImages);
         }
-
     }
 
     @Transactional
@@ -146,11 +162,11 @@ public class PostService {
 
         validate(member, postUpdateRequestDto.toEntity(member));
 
-        Post post = postRepository.findById(postId).orElseThrow(()-> new BizException("존재하지 않는 포스트 입니다.", ErrorCode.NOT_FOUND, ""));
+        Post post = postRepository.getReferenceById(postId);
 
         if (postUpdateRequestDto.getPostImgs() != null){
             for(MultipartFile image: postUpdateRequestDto.getPostImgs()){
-                String path = saveImage(image, "posts", post.getId().toString());
+                String path = saveImage(image, "posts", post.getId().toString(), false);
                 PostImage postImage = PostImage.builder().post(post).imageUrl(path).build();
                 postImageRepository.save(postImage);
             }
@@ -158,15 +174,13 @@ public class PostService {
 
         post.setTitle(postUpdateRequestDto.getTitle());
         post.setContent(postUpdateRequestDto.getContent());
-
-        return ;
     }
 
     @Transactional
     public void deletePost(CustomUserDetails customUserDetails, UUID postId) {
 
         Member member = customUserDetails.getUser();
-        Post post = postRepository.findById(postId).orElseThrow(()-> new BizException("존재하지 않는 포스트 입니다.", ErrorCode.NOT_FOUND, ""));
+        Post post = postRepository.getReferenceById(postId);
         validate(member, post);
 
         post.setIsDeleted(true);

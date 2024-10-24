@@ -24,10 +24,11 @@ public class PostCreateRequestDto {
     private BigDecimal longitude;
     private List<MultipartFile> postImgs;
 
-    public Post toEntity(Member member){
+    public Post toEntity(Member member, String thumbnail){
         return Post.builder()
                 .title(title)
                 .content(content)
+                .thumbnail(thumbnail)
                 .member(member)
                 .latitude(latitude)
                 .longitude(longitude)

@@ -18,7 +18,7 @@ import java.util.UUID;
 
 @Service
 public class StaticFiles {
-    public static String saveImage(MultipartFile file, String route, String id, Boolean isThumbnail) {
+    public static String saveImage(MultipartFile file, String route, String id, Boolean isResize) {
 
         String name = file.getOriginalFilename();
         assert name != null;
@@ -30,14 +30,12 @@ public class StaticFiles {
         // Path 객체 생성
         Path path = Paths.get("./app" + dbPath);
 
-
-
         try{
             if (!Files.exists(path.getParent())) {
                 Files.createDirectories(path.getParent());
             }
 
-            if (isThumbnail){
+            if (isResize){
                 resizeAndSave(file, String.valueOf(path), fileName, extension);
             } else {
                 Files.write(path, file.getBytes());
@@ -68,12 +66,12 @@ public class StaticFiles {
         // Max Size : 250 x 250
         if (originalWidth > MAX_SIZE || originalHeight > MAX_SIZE) {
             // double로 캐스팅하여 나눗셈 수행
-            ratio = Math.min((double)MAX_SIZE / originalWidth, (double)MAX_SIZE / originalHeight);
+            ratio = Math.min((double) MAX_SIZE / originalWidth, (double) MAX_SIZE / originalHeight);
         }
 
         // 새로운 크기 계산 (최소 1픽셀 보장)
-        int width = Math.max(1, (int)(originalWidth * ratio));
-        int height = Math.max(1, (int)(originalHeight * ratio));
+        int width = Math.max(1, (int) (originalWidth * ratio));
+        int height = Math.max(1, (int) (originalHeight * ratio));
 
 
         BufferedImage resizedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
@@ -89,6 +87,7 @@ public class StaticFiles {
         File saveFile = new File(path + name);
 
         ImageIO.write(resizedImage, extension, saveFile);
+    }
 
     //TODO 남재현 작성 테스트 필요.
     public static void deleteImage(String dbPath) {

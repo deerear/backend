@@ -118,7 +118,7 @@ public class MemberService {
 
         // 프로필 이미지가 포함되어 있으면 저장
         if (memberUpdateRequestDto.getProfileImg() != null) {
-            String path = saveImage(memberUpdateRequestDto.getProfileImg(), "members", member.getId().toString());
+            String path = saveImage(memberUpdateRequestDto.getProfileImg(), "members", member.getId().toString(), false);
             member.setProfileImgUrl(path);
         } else if (memberUpdateRequestDto.getProfileImg() == null) {
             // 프로필 이미지가 없고 기존 이미지가 있다면 삭제

@@ -36,10 +36,9 @@ public class CommentService {
     @Transactional
     public void createComment(Member member, CommentSaveRequestDto input) {
 
-        // 입력값 검증
-        final Post post = postRepository.findById(UUID.fromString(input.getPostId()))
+        Post post = postRepository.findById(UUID.fromString(input.getPostId()))
                 .orElseThrow(() -> new BizException(null, NOT_FOUND, "postId: " + input.getPostId()));
-
+        post.incrementCommentCount();
         commentRepository.save(input.toEntity(member, post));
     }
 
@@ -85,6 +84,7 @@ public class CommentService {
 
         Comment comment = commentRepository.getReferenceById(commentId);
         validateCommentOwnership(member, comment);
+        comment.getPost().decrementCommentCount();
         comment.isDeleted();
     }
 

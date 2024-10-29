@@ -3,10 +3,7 @@ package com.deerear.app.controller;
 import com.deerear.app.domain.Member;
 import com.deerear.app.dto.*;
 import com.deerear.app.repository.MemberRepository;
-import com.deerear.app.service.CommentService;
-import com.deerear.app.service.CustomUserDetails;
-import com.deerear.app.service.MemberService;
-import com.deerear.app.service.PostService;
+import com.deerear.app.service.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -14,10 +11,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
 @Slf4j
 @RestController
@@ -29,6 +22,7 @@ public class MemberController {
     private final PostService postService;
     private final CommentService commentService;
     private final MemberRepository memberRepository;
+    private final DmService dmService;
 
     @PostMapping("/sign-in")
     public ResponseEntity<MemberSignInResponseDto> signIn(@RequestBody MemberSignInRequestDto requestDto) {
@@ -36,9 +30,17 @@ public class MemberController {
         return ResponseEntity.ok(responseDto);
     }
 
+    @GetMapping("/dms")
+    public ResponseEntity<PagingResponseDto> getDms(@AuthenticationPrincipal CustomUserDetails customUserDetails,
+                                                          @ModelAttribute PagingRequestDto page) {
+        Member member = customUserDetails.getUser();
+        PagingResponseDto responseDto =  dmService.getDms(member, page);
+        return ResponseEntity.ok(responseDto);
+    }
+
     @PostMapping("/sign-up")
-    public ResponseEntity<MemberSignUpResponseDto> signUp(@RequestBody MemberSingUpRequestDto memberSingUpRequestDto) {
-        MemberSignUpResponseDto savedMemberSignUpResponseDto = memberService.signUp(memberSingUpRequestDto);
+    public ResponseEntity<MemberSignUpResponseDto> signUp(@RequestBody MemberSignUpRequestDto memberSignUpRequestDto) {
+        MemberSignUpResponseDto savedMemberSignUpResponseDto = memberService.signUp(memberSignUpRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedMemberSignUpResponseDto);
     }
 

@@ -12,11 +12,10 @@ import java.util.UUID;
 
 public interface CommentRepository extends JpaRepository<Comment, UUID> {
     // 첫 페이지를 위한 메서드 (커서가 없을 때) - 페이징 처리 추가
-    @Query("SELECT p FROM Comment p WHERE p.member = :member ORDER BY p.createdAt DESC")
-    List<Post> findFirstByMember(Member member, PageRequest pageRequest);
+    @Query("SELECT c FROM Comment c WHERE c.member = :member ORDER BY c.createdAt DESC")
+    List<Comment> findFirstByMember(Member member, PageRequest pageRequest);
 
-    // 커서를 기준으로 그 이후의 게시물을 가져오는 메서드 - 페이징 처리 추가
-    @Query("SELECT p FROM Comment p WHERE p.member = :member AND p.id > :lastCommentId ORDER BY p.createdAt DESC")
-    List<Post> findCommentsByMemberAndIdGreaterThan(Member member, UUID lastCommentId, PageRequest pageRequest);
-
+    // 커서를 기준으로 그 이후의 댓글을 가져오는 메서드 - 페이징 처리 추가
+    @Query("SELECT c FROM Comment c WHERE c.member = :member AND c.id > :lastCommentId ORDER BY c.createdAt DESC")
+    List<Comment> findCommentsByMemberAndIdGreaterThan(Member member, UUID lastCommentId, PageRequest pageRequest);
 }

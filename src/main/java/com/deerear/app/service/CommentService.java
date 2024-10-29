@@ -45,31 +45,32 @@ public class CommentService {
 
     @Transactional(readOnly = true)
     public PagingResponseDto getComments(Member member, PagingRequestDto pagingRequestDto) {
-        String lastPostId = pagingRequestDto.getKey();
-        //int size = pagingRequestDto.getSize();
+        String lastCommentId = pagingRequestDto.getKey();
+        int size = pagingRequestDto.getSize() != 0 ? pagingRequestDto.getSize() : 10; // 요청된 size로 페이징 설정, 기본 10으로 설정
+        PageRequest pageRequest = PageRequest.of(0, size);
 
-        PageRequest pageRequest = PageRequest.of(0, 10); // 페이징 처리
-
-        List<Post> comments;
-        if (lastPostId == null) {
-            // 첫 페이지를 요청하는 경우
+        List<Comment> comments;
+        if (lastCommentId == null) {
+            // 첫 페이지 요청 시
             comments = commentRepository.findFirstByMember(member, pageRequest);
         } else {
-            // 커서를 기준으로 그 이후의 게시물을 가져옴
-            comments = commentRepository.findCommentsByMemberAndIdGreaterThan(member, UUID.fromString(lastPostId), pageRequest);
+            // 커서를 기준으로 이후의 댓글을 가져옴
+            comments = commentRepository.findCommentsByMemberAndIdGreaterThan(member, UUID.fromString(lastCommentId), pageRequest);
         }
 
-        boolean hasNext = comments.size() == 10; // 다음 페이지 여부 확인
+        boolean hasNext = comments.size() == size; // 다음 페이지 여부 확인
 
         List<Object> commentDtos = comments.stream()
-                .map(post -> MemberGetCommentssResponseDto.toDto(
-                        post.getId(),
-                        post.getTitle(),
-                        post.getCreatedAt()
+                .map(comment -> MemberGetCommentsResponseDto.toDto(
+                        comment.getId(),
+                        comment.getContent(),
+                        comment.getCreatedAt() // Comment 엔티티의 생성 날짜
                 ))
                 .collect(Collectors.toList());
 
-        return new PagingResponseDto(commentDtos, 10, lastPostId, hasNext);
+        String nextKey = hasNext ? comments.get(comments.size() - 1).getId().toString() : null;
+
+        return new PagingResponseDto(commentDtos, size, nextKey, hasNext);
     }
 
     @Transactional

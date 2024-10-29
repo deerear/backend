@@ -1,9 +1,6 @@
 package com.deerear.app.service;
 
-import com.deerear.app.domain.Dm;
-import com.deerear.app.domain.DmChat;
-import com.deerear.app.domain.DmMember;
-import com.deerear.app.domain.Member;
+import com.deerear.app.domain.*;
 import com.deerear.app.dto.*;
 import com.deerear.app.repository.DmChatRepository;
 import com.deerear.app.repository.DmMemberRepository;
@@ -14,11 +11,16 @@ import com.deerear.exception.BizException;
 import com.deerear.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -49,6 +51,37 @@ public class DmService {
         dmMemberRepository.save(buildDmMember(dm, chatMember, member));
 
         return dm.toDto();
+    }
+
+    @Transactional(readOnly = true)
+    public PagingResponseDto getDms(Member member, PagingRequestDto pagingRequestDto) {
+        String lastDmId = pagingRequestDto.getKey(); // 커서로 사용될 key
+        int size = pagingRequestDto.getSize() != 0 ? pagingRequestDto.getSize() : 10; // 요청된 size로 페이징 설정, 기본 10으로 설정
+
+        PageRequest pageRequest = PageRequest.of(0, size); // 페이징 처리
+
+        List<DmMember> dmMembers;
+        if (lastDmId == null) {
+            // 첫 페이지 요청 시
+            dmMembers = dmMemberRepository.findDmsByMember(member, pageRequest);
+        } else {
+            // 커서를 기준으로 이후의 DM을 가져옴
+            dmMembers = dmMemberRepository.findDmsByMemberAndIdGreaterThan(member, UUID.fromString(lastDmId), pageRequest);
+        }
+
+        boolean hasNext = dmMembers.size() == size; // 다음 페이지 여부 확인
+
+        List<Object> dmDtos = dmMembers.stream()
+                .map(dmMember -> MemberGetDmsResponseDto.toDto(
+                        dmMember.getDm().getId(), // DM ID
+                        dmMember.getDm().getLastMessage(), // 마지막 메시지
+                        dmMember.getCreatedAt() // Comment 엔티티의 생성 날짜
+                ))
+                .collect(Collectors.toList());
+
+        String nextKey = hasNext ? dmMembers.get(dmMembers.size() - 1).getDm().getId().toString() : null;
+
+        return new PagingResponseDto(dmDtos, size, nextKey, hasNext);
     }
 
     @Transactional(readOnly = true)

@@ -1,8 +1,6 @@
 package com.deerear.app.service;
 
 import com.deerear.app.domain.Member;
-import com.deerear.app.domain.Post;
-import com.deerear.app.domain.PostImage;
 import com.deerear.app.dto.*;
 import com.deerear.app.repository.MemberRepository;
 import com.deerear.constant.ErrorCode;
@@ -17,9 +15,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.Optional;
-import java.util.UUID;
 
 import static com.deerear.app.util.StaticFiles.deleteImage;
 import static com.deerear.app.util.StaticFiles.saveImage;
@@ -36,19 +31,25 @@ public class MemberService {
 
     @Transactional
     public MemberSignInResponseDto signIn(MemberSignInRequestDto memberSignInRequestDto) {
+        // OAuth 여부 판단을 DTO의 필드로 결정
         validateSignIn(memberSignInRequestDto.getEmail(), memberSignInRequestDto.getPassword());
 
         Member member = memberRepository.findByEmail(memberSignInRequestDto.getEmail())
                 .orElseThrow(() -> new BizException("해당하는 회원을 찾을 수 없습니다.", ErrorCode.USER_NOT_FOUND, "email: " + memberSignInRequestDto.getEmail()));
 
-        boolean matches = passwordEncoder.matches(memberSignInRequestDto.getPassword(), member.getPassword());
-        if (!matches) {
-            throw new BizException("비밀번호가 잘못되었습니다.", ErrorCode.INVALID_PASSWORD, "password: " + "");
+        Authentication authentication;
+
+        if (!memberSignInRequestDto.isOAuth()) {
+            // 일반 로그인 처리
+            boolean matches = passwordEncoder.matches(memberSignInRequestDto.getPassword(), member.getPassword());
+            if (!matches) {
+                throw new BizException("비밀번호가 잘못되었습니다.", ErrorCode.INVALID_PASSWORD, "password: " + "");
+            }
         }
 
-        Authentication authentication = authenticateUser(memberSignInRequestDto.getEmail(), memberSignInRequestDto.getPassword());
-        MemberSignInResponseDto memberSignInResponseDto = jwtTokenProvider.generateToken(authentication);
+        authentication = authenticateUser(memberSignInRequestDto.getEmail(), memberSignInRequestDto.getPassword());
 
+        MemberSignInResponseDto memberSignInResponseDto = jwtTokenProvider.generateToken(authentication);
         saveRefreshToken(member, memberSignInResponseDto);
 
         return MemberSignInResponseDto.toDto(memberSignInResponseDto.getAccessToken(), memberSignInResponseDto.getRefreshToken());
@@ -72,17 +73,17 @@ public class MemberService {
     }
 
     @Transactional
-    public MemberSignUpResponseDto signUp(MemberSingUpRequestDto memberSingUpRequestDto) {
-        validateSignUp(memberSingUpRequestDto);
+    public MemberSignUpResponseDto signUp(MemberSignUpRequestDto memberSignUpRequestDto) {
+        validateSignUp(memberSignUpRequestDto);
+        String encodedPassword;
+        encodedPassword = passwordEncoder.encode(memberSignUpRequestDto.getPassword());
 
-        String encodedPassword = passwordEncoder.encode(memberSingUpRequestDto.getPassword());
-
-        Member savedMember = memberRepository.save(memberSingUpRequestDto.toEntity(encodedPassword));
+        Member savedMember = memberRepository.save(memberSignUpRequestDto.toEntity(encodedPassword));
 
         return MemberSignUpResponseDto.toDto(savedMember);
     }
 
-    private void validateSignUp(MemberSingUpRequestDto requestDto) {
+    private void validateSignUp(MemberSignUpRequestDto requestDto) {
         if (memberRepository.existsByEmail(requestDto.getEmail())) {
             throw new BizException("이미 사용 중인 사용자 이메일입니다.", ErrorCode.USERNAME_ALREADY_EXISTS, "email: " + requestDto.getEmail());
         }

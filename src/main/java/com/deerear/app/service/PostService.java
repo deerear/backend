@@ -54,21 +54,21 @@ public class PostService {
 
     @Transactional(readOnly = true)
     public PagingResponseDto getPosts(Member member, PagingRequestDto pagingRequestDto) {
-        String lastPostId = pagingRequestDto.getKey(); // 커서로 사용될 key
-        //int size = pagingRequestDto.getSize();
+        String lastPostId = pagingRequestDto.getKey();
+        int size = pagingRequestDto.getSize() != 0 ? pagingRequestDto.getSize() : 10; // 요청된 size로 페이징 설정, 기본 10으로 설정
 
-        PageRequest pageRequest = PageRequest.of(0, 10); // 페이징 처리
+        PageRequest pageRequest = PageRequest.of(0, size);
 
         List<Post> posts;
         if (lastPostId == null) {
-            // 첫 페이지를 요청하는 경우
+            // 첫 페이지 요청 시
             posts = postRepository.findFirstByMember(member, pageRequest);
         } else {
-            // 커서를 기준으로 그 이후의 게시물을 가져옴
+            // 커서를 기준으로 이후의 게시물 조회
             posts = postRepository.findPostsByMemberAndIdGreaterThan(member, UUID.fromString(lastPostId), pageRequest);
         }
 
-        boolean hasNext = posts.size() == 10; // 다음 페이지 여부 확인
+        boolean hasNext = posts.size() == size; // 다음 페이지 여부 확인
 
         List<Object> postDtos = posts.stream()
                 .map(post -> MemberGetPostsResponseDto.toDto(
@@ -78,8 +78,9 @@ public class PostService {
                         post.getCreatedAt()))
                 .collect(Collectors.toList());
 
-        // 게시글 리스트와 페이징 정보를 담은 PagedResponseDto 반환
-        return new PagingResponseDto(postDtos, 10, lastPostId, hasNext);
+        String nextKey = hasNext ? posts.get(posts.size() - 1).getId().toString() : null;
+
+        return new PagingResponseDto(postDtos, size, nextKey, hasNext);
     }
 
     @Transactional(readOnly = true)

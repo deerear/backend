@@ -27,11 +27,7 @@ public class CommentController {
 
     @PostMapping
     public ResponseEntity<Void> createComment(@AuthenticationPrincipal CustomUserDetails customUserDetails,
-                                              @Valid @RequestBody CommentSaveRequestDto input, Errors errors) {
-        // TODO 이 로직 제거 할 예정~~~
-        if (errors.hasErrors()) {
-            throw new BizException(null, NOT_NULL, errors.getAllErrors().get(0).getDefaultMessage());
-        }
+                                              @Valid @RequestBody CommentSaveRequestDto input) {
         commentService.createComment(customUserDetails.getUser(), input);
         return ResponseEntity.status(HttpStatus.OK).build();
     }

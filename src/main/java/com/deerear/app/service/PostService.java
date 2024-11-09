@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -83,7 +84,7 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public PostListResponseDto listPosts(CustomUserDetails customUserDetails, PostListRequestDto postListRequestDto, String key, Integer size){
+    public PagingResponseDto listPosts(CustomUserDetails customUserDetails, PostListRequestDto postListRequestDto, String key, Integer size){
 
         Member member = customUserDetails.getUser();
 
@@ -122,10 +123,10 @@ public class PostService {
                 .toList();
 
 
-        return PostListResponseDto.builder()
-                .objects(postListDto)
+        return PagingResponseDto.builder()
+                .objects(Collections.singletonList(postListDto))
                 .hasNext(hasNext)
-                .nextKey(nextKey)
+                .key(nextKey)
                 .size(postListDto.size())
                 .build();
     }

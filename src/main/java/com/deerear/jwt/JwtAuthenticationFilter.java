@@ -40,8 +40,7 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
                 || "/api/token/refresh".equals(path)
                 || path.startsWith("/docs")
                 || path.startsWith("/restdoc")
-                || path.startsWith("/images")
-                || "/api/members/login/naver/callback".equals(path)) {
+                || path.startsWith("/images")) {
             chain.doFilter(request, response);
             return;
         }

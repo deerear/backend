@@ -156,8 +156,13 @@ public class NaverService {
             member = memberRepository.findByEmail(signUpResponseDto.getEmail())
                     .orElseThrow(() -> new BizException("멤버 정보를 찾을 수 없습니다.", ErrorCode.USER_NOT_FOUND, "email: " + email));
         } else {
-            // 기존 회원일 경우 회원 정보 사용
+            // 기존 회원일 경우 가져온 회원 객체를 사용
             member = optionalMember.get();
+
+            // 일반 로그인으로 가입한 계정인지 확인
+            if (member.getPassword() != null && !member.getPassword().isEmpty()) {
+                throw new BizException("해당 이메일은 일반 로그인으로 가입되었습니다. 일반 로그인을 시도해 주세요.", ErrorCode.USERNAME_ALREADY_EXISTS,"email :" + email);
+            }
         }
 
         // OAuth 사용자의 경우 비밀번호 체크는 생략
@@ -184,7 +189,7 @@ public class NaverService {
     private void saveRefreshToken(Member member, MemberSignInResponseDto memberSignInResponseDto) {
         String refreshToken = memberSignInResponseDto.getRefreshToken();
         member.setRefreshToken(refreshToken);
-        memberRepository.save(member); // 데이터베이스에 리프레시 토큰 저장
+        memberRepository.save(member);
     }
 
 }

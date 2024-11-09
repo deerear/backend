@@ -14,11 +14,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
-import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
@@ -42,6 +37,7 @@ public class SecurityConfig {
                         .requestMatchers("/restdoc/**").permitAll()
                         .requestMatchers("/api/members/sign-up").permitAll()	// ⭐
                         .requestMatchers("/api/members/sign-in").permitAll()
+                        .requestMatchers("/api/members/profile").permitAll()
                         .requestMatchers("/api/oauth/**").permitAll()
                         .requestMatchers("/api/members/check-nickname").permitAll()
                         .requestMatchers("/api/members/check-email").permitAll()

@@ -14,7 +14,7 @@ public class DmChatsResponseDto {
 
     private List<DmChatDto> objects;
     private Boolean hasNext;
-    private String nextKey;
+    private String key;
     private Integer size;
 
 }

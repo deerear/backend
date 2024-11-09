@@ -26,8 +26,8 @@ public class DmController {
     }
 
     @GetMapping("/api/dm-chats/{dmId}")
-    public ResponseEntity<DmChatsResponseDto> listDmChats(@AuthenticationPrincipal CustomUserDetails member, @PathVariable UUID dmId, @RequestParam String nextKey, @RequestParam Integer size) {
-        return ResponseEntity.ok(dmService.listDmChats(member, dmId, nextKey, size));
+    public ResponseEntity<DmChatsResponseDto> listDmChats(@AuthenticationPrincipal CustomUserDetails member, @PathVariable UUID dmId, @RequestParam String key, @RequestParam Integer size) {
+        return ResponseEntity.ok(dmService.listDmChats(member, dmId, key, size));
     }
 
     @MessageMapping("/{dmId}")

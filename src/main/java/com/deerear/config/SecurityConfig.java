@@ -37,6 +37,7 @@ public class SecurityConfig {
                         .requestMatchers("/restdoc/**").permitAll()
                         .requestMatchers("/api/members/sign-up").permitAll()	// ⭐
                         .requestMatchers("/api/members/sign-in").permitAll()
+                        .requestMatchers("/api/members/profile").permitAll()
                         .requestMatchers("/api/oauth/**").permitAll()
                         .requestMatchers("/api/members/check-nickname").permitAll()
                         .requestMatchers("/api/members/check-email").permitAll()

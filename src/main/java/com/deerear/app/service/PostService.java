@@ -60,12 +60,11 @@ public class PostService {
         PageRequest pageRequest = PageRequest.of(0, size);
 
         List<Post> posts;
-        if (lastPostId == null) {
-            // 첫 페이지 요청 시
-            posts = postRepository.findFirstByMember(member, pageRequest);
-        } else {
+        try {
+            posts = postRepository.findNextPage(member, pageRequest);
+        } catch (IllegalArgumentException e){
             // 커서를 기준으로 이후의 게시물 조회
-            posts = postRepository.findPostsByMemberAndIdGreaterThan(member, UUID.fromString(lastPostId), pageRequest);
+            posts = postRepository.findNextPage(member, UUID.fromString(lastPostId), pageRequest);
         }
 
         boolean hasNext = posts.size() == size; // 다음 페이지 여부 확인

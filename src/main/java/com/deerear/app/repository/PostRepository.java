@@ -27,6 +27,12 @@ public interface PostRepository extends JpaRepository<Post, UUID> {
     @Query("SELECT e FROM Post e WHERE  e.latitude >= :startLatitude AND e.longitude >= :startLongitude AND e.latitude <= :endLatitude AND e.longitude <= :endLongitude AND e.isDeleted = false ORDER BY e.createdAt DESC")
     List<Post> findNextPage(@Param("startLatitude") BigDecimal startLatitude, @Param("startLongitude") BigDecimal startLongitude,@Param("endLatitude") BigDecimal endLatitude, @Param("endLongitude") BigDecimal endLongitude, Pageable pageable);
 
+    @Query("SELECT e FROM Post e WHERE e.member = :member And e.id != :nextKey AND e.isDeleted = false ORDER BY e.createdAt DESC")
+    List<Post> findNextPage(@Param("member") Member member, @Param("nextKey") UUID nextKey, Pageable pageable);
+
+    @Query("SELECT e FROM Post e WHERE e.member = :member And e.isDeleted = false ORDER BY e.createdAt DESC")
+    List<Post> findNextPage(@Param("member") Member member, Pageable pageable);
+
     // 첫 페이지를 위한 메서드 (커서가 없을 때) - 페이징 처리 추가
     @Query("SELECT p FROM Post p WHERE p.member = :member ORDER BY p.createdAt DESC")
     List<Post> findFirstByMember(Member member, PageRequest pageRequest);

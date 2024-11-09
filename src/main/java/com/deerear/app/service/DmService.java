@@ -120,7 +120,7 @@ public class DmService {
         return DmChatsResponseDto.builder()
                 .objects(dmChatsDto)
                 .hasNext(hasNext)
-                .nextKey(resNextKey)
+                .key(resNextKey)
                 .size(size)
                 .build();
     }

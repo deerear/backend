@@ -1,5 +1,6 @@
 package com.deerear.app.controller;
 
+import com.deerear.app.dto.KakaoDto;
 import com.deerear.app.dto.MemberSignInResponseDto;
 import com.deerear.app.dto.NaverDto;
 import com.deerear.app.service.KakaoService;
@@ -22,6 +23,7 @@ import java.io.IOException;
 public class OauthController {
 
     private final NaverService naverService;
+    private final KakaoService kakaoService;
 
     @GetMapping("/naver")
     public ResponseEntity<String> loginWithNaver() {
@@ -30,7 +32,7 @@ public class OauthController {
     }
 
     @GetMapping("/naver/callback")
-    public ResponseEntity<MemberSignInResponseDto> callback(HttpServletRequest request) throws Exception {
+    public ResponseEntity<MemberSignInResponseDto> callbackWithNaver(HttpServletRequest request) throws Exception {
         // 네이버에서 전달된 코드를 사용하여 사용자 정보를 가져옴
         NaverDto naverInfo = naverService.getNaverInfo(request.getParameter("code"));
 
@@ -40,24 +42,24 @@ public class OauthController {
         return ResponseEntity.ok(responseDto);
     }
 
-    //TODO 카카오는 추가할 예정
-//    private final KakaoService kakaoService;
-//
-//    @Value("${KAKAO_CLIENT_ID}")
-//    private String clientId;
-//    @Value("${KAKAO_REDIRECT_URI}")
-//    private String redirectUri;
-//
-//    @GetMapping("")
-//    public ResponseEntity<String> getKakaoAuthUrl() {
-//        String location = "https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=" + clientId + "&redirect_uri=" + redirectUri;
-//        return ResponseEntity.ok(location);
-//    }
-//
-//    @GetMapping("/callback")
-//    public ResponseEntity<?> callback(@RequestParam("code") String code) throws IOException {
-//        String accessToken = kakaoService.getAccessTokenFromKakao(code);
-//        return new ResponseEntity<>(HttpStatus.OK);
-//    }
+    @Value("${KAKAO_CLIENT_ID}")
+    private String clientId;
+    @Value("${KAKAO_REDIRECT_URI}")
+    private String redirectUri;
+
+    @GetMapping("/kakao")
+    public ResponseEntity<String> loginWithKokao() {
+        String kakaoLoginUrl = kakaoService.getKakaoLogin();
+        return ResponseEntity.ok(kakaoLoginUrl);
+    }
+
+    @GetMapping("/kakao/callback")
+    public ResponseEntity<MemberSignInResponseDto> callbackWithKakao(HttpServletRequest request) throws Exception {
+        KakaoDto kakaoInfo = kakaoService.getKakaoInfo(request.getParameter("code"));
+
+        MemberSignInResponseDto responseDto = kakaoService.signIn(kakaoInfo);
+
+        return ResponseEntity.ok(responseDto);
+    }
 
 }

@@ -181,6 +181,7 @@ public class NaverService {
 
         // 액세스 및 리프레시 토큰 반환
         return MemberSignInResponseDto.toDto(
+                memberSignInResponseDto.getGrantType(),
                 memberSignInResponseDto.getAccessToken(),
                 memberSignInResponseDto.getRefreshToken()
         );

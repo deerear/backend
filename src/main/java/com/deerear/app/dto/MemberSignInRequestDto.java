@@ -16,6 +16,4 @@ public class MemberSignInRequestDto {
 
     @NotBlank(message = "비밀번호를 입력해주세요")
     private String password;
-
-    private boolean isOAuth;
 }

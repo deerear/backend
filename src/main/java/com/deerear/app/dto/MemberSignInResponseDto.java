@@ -12,8 +12,9 @@ public class MemberSignInResponseDto {
     private String accessToken;
     private String refreshToken;
 
-    public static MemberSignInResponseDto toDto(String accessToken, String refreshToken) {
+    public static MemberSignInResponseDto toDto(String grantType, String accessToken, String refreshToken) {
         return MemberSignInResponseDto.builder()
+                .grantType(grantType)
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();

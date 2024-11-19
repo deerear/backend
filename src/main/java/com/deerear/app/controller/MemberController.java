@@ -81,7 +81,7 @@ public class MemberController {
         return ResponseEntity.ok(responseDto);
     }
 
-    @PutMapping(value = "/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping("/profile")
     public ResponseEntity<Object> updateProfile(
             @AuthenticationPrincipal CustomUserDetails customUserDetails,
             @ModelAttribute MemberUpdateRequestDto request) {

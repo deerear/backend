@@ -1,13 +1,11 @@
 package com.deerear.jwt;
 
 import com.deerear.app.service.CustomUserDetailsService;
-import com.deerear.constant.ErrorCode;
 import com.deerear.exception.BizException;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.ServletRequest;
-import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +14,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.StringUtils;
-import org.springframework.web.filter.GenericFilterBean;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -65,9 +62,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         } catch (ExpiredJwtException e) {
             SecurityContextHolder.clearContext();
             sendErrorResponse(response, HttpStatus.UNAUTHORIZED, "토큰이 만료되었습니다.");
-        } catch (Exception e) {
+        } catch (JwtException e) {
             SecurityContextHolder.clearContext();
-            sendErrorResponse(response, HttpStatus.UNAUTHORIZED, "인증에 실패했습니다.");
+            sendErrorResponse(response, HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다.");
+        } catch (BizException e) {
+            SecurityContextHolder.clearContext();
+            sendErrorResponse(response, HttpStatus.UNAUTHORIZED, e.getMessage());
         }
     }
 

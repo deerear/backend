@@ -1,6 +1,7 @@
 package com.deerear.app.service;
 
 import com.deerear.app.domain.Comment;
+import com.deerear.app.domain.DmMember;
 import com.deerear.app.domain.Member;
 import com.deerear.app.domain.Post;
 import com.deerear.app.dto.*;
@@ -44,30 +45,40 @@ public class CommentService {
 
     @Transactional(readOnly = true)
     public PagingResponseDto getComments(Member member, PagingRequestDto pagingRequestDto) {
-        String lastCommentId = pagingRequestDto.getKey();
-        int size = pagingRequestDto.getSize() != 0 ? pagingRequestDto.getSize() : 10; // 요청된 size로 페이징 설정, 기본 10으로 설정
-        PageRequest pageRequest = PageRequest.of(0, size);
+        int size = pagingRequestDto.getSize() != 0 ? pagingRequestDto.getSize() : 10;
+        PageRequest pageRequest = PageRequest.of(0, size + 1);
 
         List<Comment> comments;
-        if (lastCommentId == null) {
-            // 첫 페이지 요청 시
+        String lastCommentId = pagingRequestDto.getKey();
+
+        KeyParser.BasicKey basicKey = KeyParser.parseKey(lastCommentId);
+        UUID idCursor = basicKey != null ? basicKey.id() : null;
+
+        if (idCursor == null) {
             comments = commentRepository.findFirstByMember(member, pageRequest);
         } else {
-            // 커서를 기준으로 이후의 댓글을 가져옴
-            comments = commentRepository.findCommentsByMemberAndIdGreaterThan(member, UUID.fromString(lastCommentId), pageRequest);
+            Comment lastComment = commentRepository.findById(basicKey.id())
+                    .orElseThrow(() -> new IllegalArgumentException("Invalid cursor"));
+
+            comments = commentRepository.findCommentsByMemberAndCursor(
+                    member,
+                    lastComment.getCreatedAt(),
+                    pageRequest
+            );
         }
 
-        boolean hasNext = comments.size() == size; // 다음 페이지 여부 확인
+        boolean hasNext = comments.size() > size;
+        List<Comment> responseComments = hasNext ? comments.subList(0, size) : comments;
 
-        List<Object> commentDtos = comments.stream()
+        List<Object> commentDtos = responseComments.stream()
                 .map(comment -> MemberGetCommentsResponseDto.toDto(
                         comment.getId(),
                         comment.getContent(),
-                        comment.getCreatedAt() // Comment 엔티티의 생성 날짜
+                        comment.getCreatedAt()
                 ))
                 .collect(Collectors.toList());
 
-        String nextKey = hasNext ? comments.get(comments.size() - 1).getId().toString() : null;
+        String nextKey = hasNext ? responseComments.get(size - 1).getId().toString() : null;
 
         return new PagingResponseDto(commentDtos, size, nextKey, hasNext);
     }

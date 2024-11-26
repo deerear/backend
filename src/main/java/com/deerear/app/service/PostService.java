@@ -5,6 +5,7 @@ import com.deerear.app.dto.*;
 import com.deerear.app.repository.LikeRepository;
 import com.deerear.app.repository.PostImageRepository;
 import com.deerear.app.repository.PostRepository;
+import com.deerear.app.util.KeyParser;
 import com.deerear.constant.ErrorCode;
 import com.deerear.exception.BizException;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.expression.ExpressionException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -39,6 +41,9 @@ public class PostService {
     public PostDetailResponseDto getPost(UUID postId) {
 
         Post post = postRepository.getReferenceById(postId);
+
+        validate(post);
+
         Member member = post.getMember();
 
         List<PostImageDto> postImageListDto = postImageRepository.findAllByPostId(postId).stream()
@@ -50,7 +55,20 @@ public class PostService {
 
         Boolean isLike = likeRepository.existsByMemberAndTargetTypeAndTargetId(member, Likeable.TargetType.POST, postId);
 
-        return post.toDto(member, postImageListDto, isLike);
+        return PostDetailResponseDto.builder()
+                .postId(post.getId())
+                .nickname(member.getNickname())
+                .profileImg(member.getProfileImgUrl())
+                .title(post.getTitle())
+                .content(post.getContent())
+                .postImgs(postImageListDto)
+                .latitude(post.getLatitude())
+                .longitude(post.getLongitude())
+                .commentCount(post.getCommentCount())
+                .likeCount(post.getLikeCount())
+                .createdAt(post.getCreatedAt())
+                .isLike(isLike)
+                .build();
     }
 
     @Transactional(readOnly = true)
@@ -82,18 +100,17 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public PagingResponseDto listPosts(CustomUserDetails customUserDetails, PostListRequestDto postListRequestDto, String key, Integer size){
+    public PagingResponseDto listPosts(CustomUserDetails customUserDetails, PostListRequestDto postListRequestDto){
 
         Member member = customUserDetails.getUser();
 
         List<Post> posts;
 
-        try {
-            UUID postId = UUID.fromString(key);
-            Post post = postRepository.getReferenceById(postId);
-            posts = postRepository.findNextPage(post.getCreatedAt(), post.getId(), postListRequestDto.getStartLatitude(), postListRequestDto.getStartLongitude(), postListRequestDto.getEndLatitude(), postListRequestDto.getEndLongitude(), Pageable.ofSize(size+1));
-        } catch (IllegalArgumentException e) {
-            posts = postRepository.findNextPage(postListRequestDto.getStartLatitude(), postListRequestDto.getStartLongitude(), postListRequestDto.getEndLatitude(), postListRequestDto.getEndLongitude(), Pageable.ofSize(size+1));
+        if (KeyParser.parseKey(postListRequestDto.getKey()) == null) {
+            posts = postRepository.findNextPage(postListRequestDto.getStartLatitude(), postListRequestDto.getStartLongitude(), postListRequestDto.getEndLatitude(), postListRequestDto.getEndLongitude(), Pageable.ofSize(postListRequestDto.getSize()+1));
+        } else {
+            Post post = postRepository.getReferenceById(UUID.fromString(postListRequestDto.getKey()));
+            posts = postRepository.findNextPage(post.getCreatedAt(), post.getId(), postListRequestDto.getStartLatitude(), postListRequestDto.getStartLongitude(), postListRequestDto.getEndLatitude(), postListRequestDto.getEndLongitude(), Pageable.ofSize(postListRequestDto.getSize()+1));
         }
 
         String nextKey = "";
@@ -171,8 +188,12 @@ public class PostService {
             }
         }
 
-        post.setTitle(postUpdateRequestDto.getTitle());
-        post.setContent(postUpdateRequestDto.getContent());
+        if (!postUpdateRequestDto.getTitle().isEmpty()){
+            post.setTitle(postUpdateRequestDto.getTitle());
+        }
+        if (!postUpdateRequestDto.getContent().isEmpty()){
+            post.setContent(postUpdateRequestDto.getContent());
+        }
     }
 
     @Transactional
@@ -201,5 +222,11 @@ public class PostService {
         } else if (!member.equals(post.getMember())){
             throw new BizException("게시글 생성자와 유저가 불일치합니다.", ErrorCode.INVALID_INPUT, "");
         };
+    }
+
+    private void validate(Post post){
+        if (post.getIsDeleted()){
+            throw new BizException("삭제된 포스트입니다.", ErrorCode.NOT_FOUND, "");
+        }
     }
 }

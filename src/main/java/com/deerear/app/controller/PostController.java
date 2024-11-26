@@ -28,8 +28,8 @@ public class PostController {
     }
 
     @GetMapping("")
-    public ResponseEntity<PagingResponseDto> listPosts(@AuthenticationPrincipal CustomUserDetails customUserDetails, PostListRequestDto request, @RequestParam String key, @RequestParam Integer size) {
-        return ResponseEntity.ok(postService.listPosts(customUserDetails, request, key, size));
+    public ResponseEntity<PagingResponseDto> listPosts(@AuthenticationPrincipal CustomUserDetails customUserDetails, @ModelAttribute PostListRequestDto postListRequestDto) {
+        return ResponseEntity.ok(postService.listPosts(customUserDetails, postListRequestDto));
     }
 
     @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

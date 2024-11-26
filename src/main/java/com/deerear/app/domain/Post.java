@@ -66,23 +66,6 @@ public class Post extends Likeable {
         }
     }
 
-    public PostDetailResponseDto toDto(Member member, List<PostImageDto> postImageListDto, Boolean isLike){
-        return PostDetailResponseDto.builder()
-                .postId(id)
-                .nickname(member.getNickname())
-                .profileImg(member.getProfileImgUrl())
-                .title(title)
-                .content(content)
-                .postImgs(postImageListDto)
-                .latitude(latitude)
-                .longitude(longitude)
-                .commentCount(commentCount)
-                .likeCount(this.getLikeCount())
-                .createdAt(this.getCreatedAt())
-                .isLike(isLike)
-                .build();
-    }
-
     public PostDto toDto(Boolean isLike){
         return PostDto.builder()
                 .postId(id)

@@ -2,6 +2,7 @@ package com.deerear.app.dto;
 
 import com.deerear.app.domain.Member;
 import com.deerear.app.domain.Post;
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.Digits;
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,7 +17,9 @@ import java.util.List;
 @AllArgsConstructor
 public class PostUpdateRequestDto {
 
+    @Nullable
     private String title;
+    @Nullable
     private String content;
     private List<MultipartFile> postImgs;
 

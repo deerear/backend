@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 
 @Getter
 @AllArgsConstructor
-public class PostListRequestDto{
+public class PostListRequestDto extends PagingRequestDto{
 
     private BigDecimal startLatitude;
     private BigDecimal startLongitude;

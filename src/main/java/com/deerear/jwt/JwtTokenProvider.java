@@ -33,28 +33,16 @@ public class JwtTokenProvider {
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
-    // 리프레시 토큰에서 사용자 이름 추출하는 메서드 추가
     public String getUsernameFromToken(String token) {
         Claims claims = parseClaims(token);
-        return claims.getSubject();  // 토큰의 주제 (subject)로 사용자 이름을 사용한다고 가정
+        return claims.getSubject();
     }
-
-    // AccessToken과 RefreshToken을 생성하는 메서드
 
     public MemberSignInResponseDto generateToken(Authentication authentication) {
         long now = System.currentTimeMillis();
-
-        // AccessToken 생성
         String accessToken = generateAccessToken(authentication, now);
-
-        // Authentication 객체에서 사용자 이름 추출
         String username = authentication.getName();
-
-        // RefreshToken 생성 - 사용자 이름을 기반으로 생성
         String refreshToken = generateRefreshToken(username, now);
-
-      //  log.debug("Generated AccessToken: {}", accessToken);
-       // log.debug("Generated RefreshToken: {}", refreshToken);
 
         return MemberSignInResponseDto.builder()
                 .grantType("Bearer")
@@ -64,71 +52,91 @@ public class JwtTokenProvider {
     }
 
     public String generateAccessToken(Authentication authentication, long now) {
-        // 권한 정보 추출
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
 
-        // 사용자 이메일 (혹은 다른 식별자를 Subject로 설정)
-        String subject = authentication.getName();
+        Date accessTokenExpiresIn = new Date(now + 1800000); // 30분
 
-        // 만료 시간 설정 (30분)
-        Date accessTokenExpiresIn = new Date(now + 1800000); // 30분 후 만료
-
-        // 토큰 생성
         return Jwts.builder()
-                .setSubject(subject)  // sub 클레임
-                .claim("auth", authorities)  // 권한 정보를 포함한 auth 클레임 추가
-                .setIssuedAt(new Date(now))  // iat 클레임 (발급 시간)
-                .setExpiration(accessTokenExpiresIn)  // exp 클레임 (만료 시간)
-                .setIssuer("deerear")  // iss 클레임
-                .signWith(key, SignatureAlgorithm.HS256)  // 서명 알고리즘
+                .setSubject(authentication.getName())
+                .claim("auth", authorities)
+                .claim("type", "access")
+                .setIssuedAt(new Date(now))
+                .setExpiration(accessTokenExpiresIn)
+                .setIssuer("deerear")
+                .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    // RefreshToken 생성 메서드
     public String generateRefreshToken(String username, long now) {
-        // Refresh Token 생성 - 2주 (14일 * 24시간 * 60분 * 60초 * 1000밀리초)
-        Date refreshTokenExpiresIn = new Date(now + 1209600000); // 2주 = 1209600000밀리초
+        Date refreshTokenExpiresIn = new Date(now + 1209600000); // 2주
 
-        // 사용자 이름을 주제로 설정
         return Jwts.builder()
-                .setSubject(username)  // 사용자 이름을 subject로 설정
+                .setSubject(username)
+                .claim("type", "refresh")  // 토큰 타입 추가
                 .setExpiration(refreshTokenExpiresIn)
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    // Jwt 토큰을 복호화하여 토큰에 들어있는 정보를 꺼내는 메서드
     public Authentication getAuthentication(String token) {
         Claims claims = parseClaims(token);
+        String tokenType = claims.get("type", String.class);
 
-        // 액세스 토큰의 경우 권한 정보가 필요함
-        if (claims.get("auth") == null) {
-            // 권한 정보가 없는 경우 리프레시 토큰인지 확인
-            if (isRefreshToken(token)) {
-                // 리프레시 토큰일 경우 권한 정보 체크하지 않음
-                return new UsernamePasswordAuthenticationToken(claims.getSubject(), null, null);
-            } else {
-                throw new BizException("권한 정보가 없는 토큰입니다.", ErrorCode.INVALID_INPUT, "토큰: " + token);
-            }
+        // 액세스 토큰 검증
+        if (!"access".equals(tokenType)) {
+            throw new BizException("유효하지 않은 토큰 타입입니다.",
+                    ErrorCode.INVALID_INPUT,
+                    "Token type: " + tokenType);
         }
 
-        // 클레임에서 권한 정보 가져오기
+        if (claims.get("auth") == null) {
+            throw new BizException("권한 정보가 없는 토큰입니다.",
+                    ErrorCode.INVALID_INPUT,
+                    "Token: " + token);
+        }
+
         Collection<? extends GrantedAuthority> authorities = Arrays.stream(claims.get("auth").toString().split(","))
                 .filter(role -> role != null && !role.trim().isEmpty())
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
 
-        // UserDetails 객체를 만들어서 Authentication return
-        UserDetails principal = new User(claims.getSubject(), "password_placeholder", authorities);
+        UserDetails principal = new User(claims.getSubject(), "", authorities);
         return new UsernamePasswordAuthenticationToken(principal, null, authorities);
     }
 
-    // 리프레시 토큰인지 확인하는 메서드
-    private boolean isRefreshToken(String token) {
-        Claims claims = parseClaims(token);
-        return claims.get("auth") == null; // 권한 정보가 없으면 리프레시 토큰으로 간주
+    public boolean validateToken(String token) {
+        try {
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+
+            String tokenType = claims.get("type", String.class);
+            if (!"access".equals(tokenType)) {
+                throw new BizException("유효하지 않은 토큰 타입입니다.",
+                        ErrorCode.INVALID_INPUT,
+                        "Token type: " + tokenType);
+            }
+
+            if (claims.getExpiration().before(new Date())) {
+                throw new BizException("만료된 토큰입니다.",
+                        ErrorCode.INVALID_INPUT,
+                        "Token: " + token);
+            }
+
+            return true;
+        } catch (ExpiredJwtException e) {
+            throw new BizException("만료된 토큰입니다.",
+                    ErrorCode.INVALID_INPUT,
+                    "Token: " + token);
+        } catch (Exception e) {
+            throw new BizException("유효하지 않은 토큰입니다.",
+                    ErrorCode.INVALID_INPUT,
+                    "Token: " + token + ", Error: " + e.getMessage());
+        }
     }
 
     public boolean validateRefreshToken(String token) {
@@ -138,46 +146,30 @@ public class JwtTokenProvider {
                     .build()
                     .parseClaimsJws(token)
                     .getBody();
-            return claims.getExpiration().after(new Date());
+
+            // 리프레시 토큰 타입 검증
+            String tokenType = claims.get("type", String.class);
+            if (!"refresh".equals(tokenType)) {
+                log.info("Invalid refresh token type: {}", tokenType);
+                return false;
+            }
+
+            return !claims.getExpiration().before(new Date());
         } catch (Exception e) {
-            log.error("Invalid Refresh Token", e);
+            log.error("Refresh token validation failed", e);
             return false;
         }
     }
 
-
-    // 토큰 정보를 검증하는 메서드
-    public boolean validateToken(String token) {
-        try {
-            Jwts.parserBuilder()
-                    .setSigningKey(key)
-                    .build()
-                    .parseClaimsJws(token);
-            return true;
-        } catch (SecurityException | MalformedJwtException e) {
-            log.info("Invalid JWT Token", e);
-        } catch (ExpiredJwtException e) {
-            log.info("Expired JWT Token", e);
-        } catch (UnsupportedJwtException e) {
-            log.info("Unsupported JWT Token", e);
-        } catch (IllegalArgumentException e) {
-            log.info("JWT claims string is empty.", e);
-        }
-        return false;
-    }
-
-
-    // accessToken
-    private Claims parseClaims(String accessToken) {
+    private Claims parseClaims(String token) {
         try {
             return Jwts.parserBuilder()
                     .setSigningKey(key)
                     .build()
-                    .parseClaimsJws(accessToken)
+                    .parseClaimsJws(token)
                     .getBody();
         } catch (ExpiredJwtException e) {
             return e.getClaims();
         }
     }
-
 }

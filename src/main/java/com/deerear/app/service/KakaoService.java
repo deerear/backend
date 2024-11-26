@@ -164,6 +164,7 @@ public class KakaoService {
         saveRefreshToken(member, memberSignInResponseDto);
 
         return MemberSignInResponseDto.toDto(
+                memberSignInResponseDto.getGrantType(),
                 memberSignInResponseDto.getAccessToken(),
                 memberSignInResponseDto.getRefreshToken()
         );

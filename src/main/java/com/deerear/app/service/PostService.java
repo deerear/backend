@@ -55,21 +55,19 @@ public class PostService {
 
     @Transactional(readOnly = true)
     public PagingResponseDto getPosts(Member member, PagingRequestDto pagingRequestDto) {
-        String lastPostId = pagingRequestDto.getKey();
-        int size = pagingRequestDto.getSize() != 0 ? pagingRequestDto.getSize() : 10; // 요청된 size로 페이징 설정, 기본 10으로 설정
-
+        int size = pagingRequestDto.getSize() != 0 ? pagingRequestDto.getSize() : 10;
         PageRequest pageRequest = PageRequest.of(0, size);
 
         List<Post> posts;
-        try {
+        String lastPostId = pagingRequestDto.getKey();
+
+        if (lastPostId == null) {
             posts = postRepository.findNextPage(member, pageRequest);
-        } catch (IllegalArgumentException e){
-            // 커서를 기준으로 이후의 게시물 조회
+        } else {
             posts = postRepository.findNextPage(member, UUID.fromString(lastPostId), pageRequest);
         }
 
-        boolean hasNext = posts.size() == size; // 다음 페이지 여부 확인
-
+        boolean hasNext = posts.size() == size;
         List<Object> postDtos = posts.stream()
                 .map(post -> MemberGetPostsResponseDto.toDto(
                         post.getId(),

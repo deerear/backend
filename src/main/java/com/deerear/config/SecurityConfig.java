@@ -3,6 +3,7 @@ package com.deerear.config;
 import com.deerear.app.service.CustomUserDetailsService;
 import com.deerear.jwt.JwtAuthenticationFilter;
 import com.deerear.jwt.JwtTokenProvider;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,6 +30,18 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 // JWT를 사용하기 때문에 세션을 사용하지 않음
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                // 예외 처리 추가
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            response.setContentType("application/json;charset=UTF-8");
+                            response.getWriter().write("{\"message\":\"인증되지 않은 접근입니다.\"}");
+                        })
+                        .accessDeniedHandler((request, response, accessDeniedException) -> {
+                            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                            response.setContentType("application/json;charset=UTF-8");
+                            response.getWriter().write("{\"message\":\"접근 권한이 없습니다.\"}");
+                        }))
                 .authorizeHttpRequests(authz -> authz
                         // 해당 API에 대해서는 모든 요청을 허가
                         // permitAll 필요한 API 추가하길 바람.

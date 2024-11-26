@@ -33,7 +33,7 @@ public class TokenController {
         String refreshToken = tokenRequestDto.getRefreshToken();
 
         // 리프레시 토큰의 유효성 검증
-        if (!jwtTokenProvider.validateToken(refreshToken)) {
+        if (!jwtTokenProvider.validateRefreshToken(refreshToken)) {
             throw new BizException("리프레시 토큰이 유효하지 않습니다.", ErrorCode.INVALID_INPUT, "refreshToken: " + refreshToken);
         }
 

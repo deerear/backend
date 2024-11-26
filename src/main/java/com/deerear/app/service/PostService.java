@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -73,20 +74,29 @@ public class PostService {
 
     @Transactional(readOnly = true)
     public PagingResponseDto getPosts(Member member, PagingRequestDto pagingRequestDto) {
+
         int size = pagingRequestDto.getSize() != 0 ? pagingRequestDto.getSize() : 10;
-        PageRequest pageRequest = PageRequest.of(0, size);
+        PageRequest pageRequest = PageRequest.of(0, size + 1);
 
         List<Post> posts;
         String lastPostId = pagingRequestDto.getKey();
 
-        if (lastPostId == null) {
+        KeyParser.BasicKey basicKey = KeyParser.parseKey(lastPostId);
+        UUID idCursor = basicKey != null ? basicKey.id() : null;
+
+
+        if (idCursor == null) {
             posts = postRepository.findNextPage(member, pageRequest);
         } else {
-            posts = postRepository.findNextPage(member, UUID.fromString(lastPostId), pageRequest);
+            posts = postRepository.findNextPage(member, idCursor, pageRequest);
         }
 
-        boolean hasNext = posts.size() == size;
-        List<Object> postDtos = posts.stream()
+        // 다음 페이지 존재 여부 확인
+        boolean hasNext = posts.size() > size;
+
+        List<Post> responsePosts = hasNext ? posts.subList(0, size) : posts;
+
+        List<Object> postDtos = responsePosts.stream()
                 .map(post -> MemberGetPostsResponseDto.toDto(
                         post.getId(),
                         post.getTitle(),
@@ -94,7 +104,7 @@ public class PostService {
                         post.getCreatedAt()))
                 .collect(Collectors.toList());
 
-        String nextKey = hasNext ? posts.get(posts.size() - 1).getId().toString() : null;
+        String nextKey = hasNext ? responsePosts.get(size - 1).getId().toString() : null;
 
         return new PagingResponseDto(postDtos, size, nextKey, hasNext);
     }
